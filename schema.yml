@@ -1,21 +1,36 @@
 openapi: 3.0.3
 info:
-  title: Your Project API
+  title: HomeServices
   version: 1.0.0
-  description: Your project description
+  description: Building API for Home Services Application
 paths:
   /api/auth/change-password/:
     post:
       operationId: api_auth_change_password_create
       tags:
       - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+        required: true
       security:
-      - cookieAuth: []
-      - basicAuth: []
+      - jwtAuth: []
       - {}
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangePassword'
+          description: ''
   /api/auth/login/:
     post:
       operationId: api_auth_login_create
@@ -130,63 +145,193 @@ paths:
       operationId: api_auth_resend_code_create
       tags:
       - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResendCode'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResendCode'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResendCode'
+        required: true
       security:
       - cookieAuth: []
       - basicAuth: []
       - {}
       responses:
         '200':
-          description: No response body
-  /api/auth/reset-password/:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResendCode'
+          description: ''
+  /api/auth/reset-new-password/:
     post:
-      operationId: api_auth_reset_password_create
+      operationId: api_auth_reset_new_password_create
       tags:
       - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResetPassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResetPassword'
+        required: true
       security:
       - cookieAuth: []
       - basicAuth: []
       - {}
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetPassword'
+          description: ''
   /api/auth/reset-password-code/:
     post:
       operationId: api_auth_reset_password_code_create
       tags:
       - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+        required: true
       security:
       - cookieAuth: []
       - basicAuth: []
       - {}
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetPasswordRequest'
+          description: ''
   /api/auth/verify-code/:
     post:
       operationId: api_auth_verify_code_create
       tags:
       - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyCode'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyCode'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyCode'
+        required: true
       security:
       - cookieAuth: []
       - basicAuth: []
       - {}
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyCode'
+          description: ''
   /api/auth/verify-reset-password-code/:
     post:
       operationId: api_auth_verify_reset_password_code_create
       tags:
       - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyRestPasswordCode'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyRestPasswordCode'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyRestPasswordCode'
+        required: true
       security:
       - cookieAuth: []
       - basicAuth: []
       - {}
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyRestPasswordCode'
+          description: ''
 components:
   schemas:
+    ChangePassword:
+      type: object
+      properties:
+        old_password:
+          type: string
+          writeOnly: true
+        new_password1:
+          type: string
+          writeOnly: true
+        new_password2:
+          type: string
+          writeOnly: true
+      required:
+      - new_password1
+      - new_password2
+      - old_password
+    ResendCode:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          writeOnly: true
+      required:
+      - email
+    ResetPassword:
+      type: object
+      properties:
+        token:
+          type: string
+          writeOnly: true
+        new_password1:
+          type: string
+          writeOnly: true
+        new_password2:
+          type: string
+          writeOnly: true
+      required:
+      - new_password1
+      - new_password2
+      - token
+    ResetPasswordRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          writeOnly: true
+      required:
+      - email
     TokenBlacklist:
       type: object
       properties:
@@ -247,6 +392,23 @@ components:
       - first_name
       - last_name
       - password
+    VerifyCode:
+      type: object
+      properties:
+        code:
+          type: string
+          writeOnly: true
+          maxLength: 5
+      required:
+      - code
+    VerifyRestPasswordCode:
+      type: object
+      properties:
+        code:
+          type: string
+          writeOnly: true
+      required:
+      - code
   securitySchemes:
     basicAuth:
       type: http
@@ -255,3 +417,7 @@ components:
       type: apiKey
       in: cookie
       name: sessionid
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
