@@ -25,13 +25,13 @@ def store_activation_code( user, activation_code):
     
     
 # Check Code Activation For user
-def check_activation_code( activation_code):
+def check_activation_code( code):
     '''
         Check if user code enter equal of Code Activation or Not
     '''
-    activation_code = CodeActivate.objects.filter(code = activation_code).last()
-    if activation_code:
-        user = activation_code.user
+    active_code = CodeActivate.objects.filter(code = code).last()
+    if active_code:
+        user = active_code.user
         CodeActivate.objects.filter(user = user).all().delete()
         return user
     return None
