@@ -1,12 +1,11 @@
-from .models import Category, Services
+from .models import Category, Services, IncludeServices, NotIncludeServices
 from rest_framework import serializers
-from urllib.parse import quote
-from django.urls import reverse
 
 class ServicesCategorySerializer(serializers.ModelSerializer):  
+    detail = serializers.HyperlinkedIdentityField(read_only=True, view_name='services:detail',lookup_field = 'id')
     class Meta:
         model = Services
-        fields = ('name', 'price_from', 'price_to')
+        fields = ('name', 'price_from', 'price_to', 'detail',)
     
 
 
@@ -18,7 +17,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('name', 'count_services',  'category_services')
+        fields = ('name', 'count_services',  'category_services',)
         
         
     def get_count_services(self, obj):
@@ -29,6 +28,24 @@ class CategoryWithServicesSerializer(serializers.ModelSerializer):
     services = ServicesCategorySerializer(many=True, read_only=True)
     class Meta:
         model = Category
-        fields = ('name',  'services')
+        fields = ('name',  'services',)
         
         
+
+class IncludeServicesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IncludeServices
+        fields = ('descriptions',)
+        
+class NotIncludeServicesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NotIncludeServices
+        fields = ('descriptions',)
+        
+
+class ServicesSerializer(serializers.ModelSerializer):
+    include_services = IncludeServicesSerializer(many=True, read_only=True)
+    not_include_services = NotIncludeServicesSerializer(many=True, read_only=True)
+    class Meta:
+        model = Services
+        fields = ('id','name', 'price_from','price_to', 'include_services', 'not_include_services',)
