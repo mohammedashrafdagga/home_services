@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'apps.authentication.apps.AuthenticationConfig',
+    'apps.services.apps.ServicesConfig',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'drf_spectacular'
@@ -69,6 +70,23 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+DATABASES = {
+   'default': {
+       'ENGINE': 'django.db.backends.postgresql',
+       'NAME': config('DATABASE_NAME'),
+       'USER': config('DATABASE_USER'),
+       'PASSWORD': config('DATABASE_PASSWORD'),
+       'HOST': config('DATABASE_HOST'),
+       'PORT': config('DATABASE_PORT'),
+       'OPTIONS': {
+            'options': '-c search_path=public',
+        },
+        'TEST': {
+            'CHARSET': 'utf8',
+        },
+   }
+}
+
 
 
 # Password validation

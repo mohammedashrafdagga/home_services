@@ -280,8 +280,101 @@ paths:
               schema:
                 $ref: '#/components/schemas/VerifyRestPasswordCode'
           description: ''
+  /api/services/{id}/detail/:
+    get:
+      operationId: api_services_detail_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Services'
+          description: ''
+  /api/services/categories/:
+    get:
+      operationId: api_services_categories_list
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+          description: ''
+  /api/services/category/{id}/services/:
+    get:
+      operationId: api_services_category_services_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryWithServices'
+          description: ''
 components:
   schemas:
+    Category:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 20
+        count_services:
+          type: string
+          readOnly: true
+        category_services:
+          type: string
+          format: uri
+          readOnly: true
+      required:
+      - category_services
+      - count_services
+      - name
+    CategoryWithServices:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 20
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServicesCategory'
+          readOnly: true
+      required:
+      - name
+      - services
     ChangePassword:
       type: object
       properties:
@@ -298,6 +391,22 @@ components:
       - new_password1
       - new_password2
       - old_password
+    IncludeServices:
+      type: object
+      properties:
+        descriptions:
+          type: string
+          maxLength: 255
+      required:
+      - descriptions
+    NotIncludeServices:
+      type: object
+      properties:
+        descriptions:
+          type: string
+          maxLength: 255
+      required:
+      - descriptions
     ResendCode:
       type: object
       properties:
@@ -332,6 +441,59 @@ components:
           writeOnly: true
       required:
       - email
+    Services:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        price_from:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        price_to:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        include_services:
+          type: array
+          items:
+            $ref: '#/components/schemas/IncludeServices'
+          readOnly: true
+        not_include_services:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotIncludeServices'
+          readOnly: true
+      required:
+      - id
+      - include_services
+      - name
+      - not_include_services
+    ServicesCategory:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        price_from:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        price_to:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        detail:
+          type: string
+          format: uri
+          readOnly: true
+      required:
+      - detail
+      - name
     TokenBlacklist:
       type: object
       properties:
