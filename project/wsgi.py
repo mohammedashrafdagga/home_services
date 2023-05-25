@@ -1,6 +1,6 @@
 
 import os
-from settings import base
+from .settings import base
 
 from django.core.wsgi import get_wsgi_application
 

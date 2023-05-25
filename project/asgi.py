@@ -1,6 +1,6 @@
 
 import os
-from settings import base
+from .settings import base
 
 
 from django.core.asgi import get_asgi_application
