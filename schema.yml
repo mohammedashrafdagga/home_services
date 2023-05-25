@@ -280,6 +280,42 @@ paths:
               schema:
                 $ref: '#/components/schemas/VerifyRestPasswordCode'
           description: ''
+  /api/orders/active-order/:
+    get:
+      operationId: api_orders_active_order_list
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+          description: ''
+  /api/orders/all-order/:
+    get:
+      operationId: api_orders_all_order_list
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+          description: ''
   /api/services/{id}/detail/:
     get:
       operationId: api_services_detail_retrieve
@@ -407,6 +443,59 @@ components:
           maxLength: 255
       required:
       - descriptions
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        order_status:
+          $ref: '#/components/schemas/OrderStatusEnum'
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        total_price:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+        date_order:
+          type: string
+          format: date
+        time_order:
+          type: string
+          format: time
+        create_at:
+          type: string
+          format: date-time
+          readOnly: true
+        update_at:
+          type: string
+          format: date-time
+          readOnly: true
+        create_by:
+          type: integer
+          nullable: true
+        service:
+          type: integer
+          nullable: true
+      required:
+      - create_at
+      - date_order
+      - id
+      - time_order
+      - update_at
+    OrderStatusEnum:
+      enum:
+      - قيد المراجعة
+      - قيد التنفيذ
+      - مكتمل
+      type: string
+      description: |-
+        * `قيد المراجعة` - قيد المراجعة
+        * `قيد التنفيذ` - قيد المراجعة
+        * `مكتمل` - مكتمل
     ResendCode:
       type: object
       properties:

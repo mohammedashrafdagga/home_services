@@ -2,11 +2,13 @@ from django.db import models
 from apps.services.models import Services
 from django.contrib.auth.models import User
 
+under_review = 'قيد المراجعة'
+underway = 'قيد التنفيذ'
+complete = 'مكتمل'
+    
 # Creating Order Model
 class Order(models.Model):
-    under_review = 'قيد المراجعة'
-    underway = 'قيد التنفيذ'
-    complete = 'مكتمل'
+
     
     ORDER_STATUS = (
         (under_review, under_review),
@@ -32,4 +34,4 @@ class Order(models.Model):
     
     
     def __str__(self):
-        return f'order for {self.service} in {self.date_order}'
+        return f'طلب خدمة {self.service} بتاريخ {self.date_order}'
