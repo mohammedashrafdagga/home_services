@@ -13,22 +13,6 @@ DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
-DATABASES = {
-   'default': {
-       'ENGINE': 'django.db.backends.postgresql',
-       'NAME': config('DATABASE_LOCAL_NAME'),
-       'USER': config('DATABASE_LOCAL_USER'),
-       'PASSWORD': config('DATABASE_LOCAL_PASSWORD'),
-       'HOST': config('DATABASE_LOCAL_HOST'),
-       'PORT': config('DATABASE_LOCAL_PORT'),
-       'OPTIONS': {
-            'options': '-c search_path=public',
-        },
-        'TEST': {
-            'CHARSET': 'utf8',
-        },
-   }
-}
 
 
 # Application definition
@@ -42,9 +26,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'apps.authentication.apps.AuthenticationConfig',
     'apps.services.apps.ServicesConfig',
+    'apps.orders.apps.OrdersConfig',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
-    'drf_spectacular'
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
