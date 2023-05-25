@@ -88,6 +88,25 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# DATABASES Settings
+DATABASES = {
+   'default': {
+       'ENGINE': 'django.db.backends.postgresql',
+       'NAME': config('DATABASE_LOCAL_NAME'),
+       'USER': config('DATABASE_LOCAL_USER'),
+       'PASSWORD': config('DATABASE_LOCAL_PASSWORD'),
+       'HOST': config('DATABASE_LOCAL_HOST'),
+       'PORT': config('DATABASE_LOCAL_PORT'),
+       'OPTIONS': {
+            'options': '-c search_path=public',
+        },
+        'TEST': {
+            'CHARSET': 'utf8',
+        },
+   }
+}
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
