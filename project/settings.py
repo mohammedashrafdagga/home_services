@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'apps.authentication.apps.AuthenticationConfig',
     'apps.services.apps.ServicesConfig',
     'apps.orders.apps.OrdersConfig',
+    'apps.review.apps.ReviewConfig',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'drf_spectacular',
