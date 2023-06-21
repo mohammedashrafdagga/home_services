@@ -12,7 +12,7 @@ from .serializers import (
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.response import Response 
 
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 
 '''
@@ -69,6 +69,7 @@ class  UserResendCodeAPIView(generics.GenericAPIView):
 '''
 class  ChangePasswordAPIView(generics.GenericAPIView):
     serializer_class =  ChangePasswordSerializer
+    permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
     def post(self, request):

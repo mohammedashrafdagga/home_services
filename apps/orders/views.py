@@ -10,6 +10,8 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 class OrderActiveListApiView(generics.ListAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
     
     # updating GetQuerySet
     def get_queryset(self):
@@ -22,8 +24,8 @@ class OrderActiveListApiView(generics.ListAPIView):
 class AllOrderListApiView(generics.ListAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    
-    
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
     # updating GetQuerySet
     def get_queryset(self):
         return super().get_queryset().filter(create_by = self.request.user)
