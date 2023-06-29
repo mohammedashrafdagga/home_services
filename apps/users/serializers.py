@@ -1,12 +1,13 @@
 from rest_framework import serializers
-from .models import Location
+from .models import Location, Profile
+from django.conf import settings
+import os
 
 class LocationSerializer(serializers.ModelSerializer):
     detail = serializers.HyperlinkedIdentityField(read_only=True,
                                                   view_name='users:get-update-delete-location',
                                                   lookup_field = 'id',
                                                   lookup_url_kwarg = 'location_id')
-
     class Meta:
         model = Location
         fields = '__all__'
@@ -20,3 +21,29 @@ class LocationSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         validated_data['user'] = self.context['request'].user
         return super().update(instance, validated_data)
+    
+    
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['image']
+    
+    def save(self, **kwargs):
+        # get image and user
+        image = self.validated_data.get('image')
+        user = self.context.get('user')
+
+        if user.profile.image:
+             # Remove the existing image file
+            existing_image_path = os.path.join(settings.MEDIA_ROOT, user.profile.image.path)
+            if os.path.exists(existing_image_path):
+                os.remove(existing_image_path)
+        # rename image
+        image_name = f'{user.username}.jpg'
+        user.profile.image = image
+        user.profile.image.name = image_name
+        user.profile.save()
+    
+        
+        return user.profile
+    
