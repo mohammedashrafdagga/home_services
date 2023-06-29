@@ -23,7 +23,6 @@ paths:
         required: true
       security:
       - jwtAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -280,15 +279,39 @@ paths:
               schema:
                 $ref: '#/components/schemas/VerifyRestPasswordCode'
           description: ''
+  /api/orders/:
+    post:
+      operationId: api_orders_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Order'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Order'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
   /api/orders/active-order/:
     get:
       operationId: api_orders_active_order_list
       tags:
       - api
       security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
+      - jwtAuth: []
       responses:
         '200':
           content:
@@ -304,9 +327,7 @@ paths:
       tags:
       - api
       security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
+      - jwtAuth: []
       responses:
         '200':
           content:
@@ -315,6 +336,32 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Order'
+          description: ''
+  /api/reviews/:
+    post:
+      operationId: api_reviews_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Review'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Review'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
           description: ''
   /api/services/{id}/detail/:
     get:
@@ -378,6 +425,143 @@ paths:
               schema:
                 $ref: '#/components/schemas/CategoryWithServices'
           description: ''
+  /api/users/location/:
+    get:
+      operationId: api_users_location_list
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Location'
+          description: ''
+    post:
+      operationId: api_users_location_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Location'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Location'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+          description: ''
+  /api/users/location/{location_id}/:
+    get:
+      operationId: api_users_location_retrieve
+      parameters:
+      - in: path
+        name: location_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+          description: ''
+    put:
+      operationId: api_users_location_update
+      parameters:
+      - in: path
+        name: location_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Location'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Location'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+          description: ''
+    patch:
+      operationId: api_users_location_partial_update
+      parameters:
+      - in: path
+        name: location_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLocation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLocation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLocation'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+          description: ''
+    delete:
+      operationId: api_users_location_destroy
+      parameters:
+      - in: path
+        name: location_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
 components:
   schemas:
     Category:
@@ -435,6 +619,46 @@ components:
           maxLength: 255
       required:
       - descriptions
+    Location:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        detail:
+          type: string
+          format: uri
+          readOnly: true
+        country:
+          type: string
+          maxLength: 100
+        city:
+          type: string
+          description: المدينة
+          maxLength: 100
+        building:
+          type: string
+          description: البناية
+          maxLength: 100
+        apartment_number:
+          type: string
+          description: رقم الشقة
+          maxLength: 20
+        phone_number:
+          type: string
+          description: رقم الهاتف
+          maxLength: 20
+        user:
+          type: integer
+          readOnly: true
+      required:
+      - apartment_number
+      - building
+      - city
+      - detail
+      - id
+      - phone_number
+      - user
     NotIncludeServices:
       type: object
       properties:
@@ -476,12 +700,14 @@ components:
           readOnly: true
         create_by:
           type: integer
+          readOnly: true
           nullable: true
         service:
           type: integer
           nullable: true
       required:
       - create_at
+      - create_by
       - date_order
       - id
       - time_order
@@ -496,6 +722,38 @@ components:
         * `قيد المراجعة` - قيد المراجعة
         * `قيد التنفيذ` - قيد المراجعة
         * `مكتمل` - مكتمل
+    PatchedLocation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        detail:
+          type: string
+          format: uri
+          readOnly: true
+        country:
+          type: string
+          maxLength: 100
+        city:
+          type: string
+          description: المدينة
+          maxLength: 100
+        building:
+          type: string
+          description: البناية
+          maxLength: 100
+        apartment_number:
+          type: string
+          description: رقم الشقة
+          maxLength: 20
+        phone_number:
+          type: string
+          description: رقم الهاتف
+          maxLength: 20
+        user:
+          type: integer
+          readOnly: true
     ResendCode:
       type: object
       properties:
@@ -530,6 +788,39 @@ components:
           writeOnly: true
       required:
       - email
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        review:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        comment:
+          type: string
+          nullable: true
+        create_at:
+          type: string
+          format: date-time
+          readOnly: true
+        update_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        service:
+          type: integer
+      required:
+      - create_at
+      - id
+      - review
+      - service
+      - update_at
+      - user
     Services:
       type: object
       properties:
