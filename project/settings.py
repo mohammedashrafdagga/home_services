@@ -29,9 +29,11 @@ INSTALLED_APPS = [
     'apps.services.apps.ServicesConfig',
     'apps.orders.apps.OrdersConfig',
     'apps.review.apps.ReviewConfig',
+    'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'drf_spectacular',
+    'apps.users.apps.UsersConfig'
 ]
 
 MIDDLEWARE = [
