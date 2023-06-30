@@ -26,6 +26,9 @@ class Services(models.Model):
     name_en = models.CharField(max_length=255, null=True, blank=True)
     slug = models.CharField(max_length=255, null=True, blank=True)
     
+    # image services
+    image = models.ImageField(upload_to='services_images', default='services_images/services.png')
+    
     # price
     price_from = models.PositiveIntegerField(default=30)
     price_to = models.PositiveIntegerField(default=50)
