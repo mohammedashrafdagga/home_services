@@ -163,5 +163,4 @@ cython_debug/
 # ignore services.josn
 services.json
 static_root/
-media/
 static/
