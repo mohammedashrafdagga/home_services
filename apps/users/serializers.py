@@ -33,15 +33,15 @@ class ProfileSerializer(serializers.ModelSerializer):
         image = self.validated_data.get('image')
         user = self.context.get('user')
 
+        # if user already Have a image profile - remove
         if user.profile.image:
-             # Remove the existing image file
-            existing_image_path = os.path.join(settings.MEDIA_ROOT, user.profile.image.path)
+            existing_image_path = user.profile.image.path
             if os.path.exists(existing_image_path):
                 os.remove(existing_image_path)
-        # rename image
-        image_name = f'{user.username}.jpg'
+        
+        # save new image with rename image
         user.profile.image = image
-        user.profile.image.name = image_name
+        user.profile.image.name = f'{user.username}.jpg'
         user.profile.save()
     
         

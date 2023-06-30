@@ -48,4 +48,4 @@ class ServicesSerializer(serializers.ModelSerializer):
     not_include_services = NotIncludeServicesSerializer(many=True, read_only=True)
     class Meta:
         model = Services
-        fields = ('id','name', 'price_from','price_to', 'include_services', 'not_include_services',)
+        fields = ('id','name','image' ,'price_from','price_to', 'include_services', 'not_include_services',)
