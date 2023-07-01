@@ -5,7 +5,7 @@ class ServicesCategorySerializer(serializers.ModelSerializer):
     detail = serializers.HyperlinkedIdentityField(read_only=True, view_name='services:detail',lookup_field = 'id')
     class Meta:
         model = Services
-        fields = ('name', 'price_from', 'price_to', 'detail',)
+        fields = ('name', 'image', 'price_from', 'price_to', 'detail',)
     
 
 
@@ -17,7 +17,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('name', 'count_services',  'category_services',)
+        fields = ('name','icon', 'count_services',  'category_services',)
         
         
     def get_count_services(self, obj):
@@ -28,7 +28,7 @@ class CategoryWithServicesSerializer(serializers.ModelSerializer):
     services = ServicesCategorySerializer(many=True, read_only=True)
     class Meta:
         model = Category
-        fields = ('name',  'services',)
+        fields = ('name', 'icon', 'services',)
         
         
 

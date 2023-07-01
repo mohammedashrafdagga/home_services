@@ -8,7 +8,7 @@ class Category(models.Model):
                                    on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField(max_length=20, unique=True)
     slug = models.CharField(max_length=20, null=True, blank=True)
-    
+    icon = models.ImageField(upload_to ='category_icons', null=True, blank=True)
     create_at = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
     
