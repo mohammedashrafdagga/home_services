@@ -1,14 +1,16 @@
 
 import os
 
-
-from django.core.asgi import get_asgi_application
-
 from project.settings.base import DEBUG
 
 if DEBUG:
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings.local")
+    setting_module = "project.settings.local"
 else:
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings.production")
+    setting_module = "project.settings.production"
 
+
+
+from django.core.asgi import get_asgi_application
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", setting_module)
 application = get_asgi_application()
