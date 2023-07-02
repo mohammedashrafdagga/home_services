@@ -1,17 +1,20 @@
-from decouple import config
+from dotenv import load_dotenv
 from datetime import timedelta
 from pathlib import Path
+import os
+
+
+# loading env variable 
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG')
-
-ALLOWED_HOSTS = ['*']
+DEBUG = os.environ.get('DEBUG') == 'True'
 
 
 
@@ -25,15 +28,17 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'apps.authentication.apps.AuthenticationConfig',
-    'apps.services.apps.ServicesConfig',
-    'apps.orders.apps.OrdersConfig',
-    'apps.review.apps.ReviewConfig',
+    # External 
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'drf_spectacular',
-    'apps.users.apps.UsersConfig'
+    # Internal app
+    'project.apps.authentication',
+    'project.apps.services',
+    'project.apps.orders',
+    'project.apps.review',
+    'project.apps.users',
 ]
 
 MIDDLEWARE = [
@@ -94,17 +99,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# DATABASES Settings
-DATABASES = {
-   'default': {
-       'ENGINE': 'django.db.backends.postgresql',
-       'NAME': config('DATABASE_NAME'),
-       'USER': config('DATABASE_USER'),
-       'PASSWORD': config('DATABASE_PASSWORD'),
-       'HOST': config('DATABASE_HOST'),
-       'PORT': config('DATABASE_PORT')
-   }
-}
 
 
 # Internationalization
@@ -141,8 +135,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = '587'
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
 
 

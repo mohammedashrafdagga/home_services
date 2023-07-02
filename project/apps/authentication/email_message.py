@@ -9,7 +9,7 @@ def send_activation_email(user, activation_code):
     '''
         This for Sending Message Contains Activation Code for the User
     '''
-    template = 'activate_code.html'
+    template = 'email_message/activate_code.html'
     subject = 'Account Activation'
     context = {
         "title": subject,
@@ -28,7 +28,7 @@ def thank_activation_email(user):
     '''
         This for Sending Message For thank User for Activate Account
     '''
-    template = 'is_activate.html'
+    template = 'email_message/is_activate.html'
     subject = 'Thank for activation your account '
     context = {
         "title": subject,
@@ -43,7 +43,7 @@ def resend_activation_email(user, activation_code):
     '''
         This for Sending Message Contains Activation Code for the User
     '''
-    template = 'activate_code.html'
+    template = 'email_message/activate_code.html'
     subject = 'Resend Code for Account Activation'
     context = {
         "title": subject,
@@ -58,7 +58,7 @@ def change_password_email(user):
     '''
         Change Password Successfully sending email
     '''
-    template = 'change_password.html'
+    template = 'email_message/change_password.html'
     subject = 'Change Password Successfully'
     html_content = render_to_string(template, {
         "title": subject
@@ -73,7 +73,7 @@ def reset_password_code_email(email, reset_password_code):
     '''
         This for Sending Message Contains resetpassword Code for the User
     '''
-    template = 'reset_password.html'
+    template = 'email_message/reset_password.html'
     subject = 'Resend Code for reset password'
     context = {
         "title": subject,
