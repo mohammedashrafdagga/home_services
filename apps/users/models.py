@@ -7,7 +7,7 @@ class Profile(models.Model):
     image = models.ImageField(upload_to='profile_images', null=True, blank=True, help_text='صورة شخصية')
 
     def __str__(self):
-        return self.image.name
+        return self.user.username
 
 class Location(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='locations')
