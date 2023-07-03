@@ -31,11 +31,11 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'drf_spectacular',
     # Internal app
-    'project.apps.authentication',
-    'project.apps.services',
-    'project.apps.orders',
-    'project.apps.review',
-    'project.apps.users',
+    'apps.authentication',
+    'apps.services',
+    'apps.orders',
+    'apps.review',
+    'apps.users',
 ]
 
 MIDDLEWARE = [

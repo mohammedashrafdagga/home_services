@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from project.apps.services.models import Services
+from apps.services.models import Services
 
 # Create your models here.
 class Review(models.Model):

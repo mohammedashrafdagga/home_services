@@ -1,5 +1,5 @@
 from django.db import models
-from project.apps.services.models import Services
+from apps.services.models import Services
 from django.contrib.auth.models import User
 
 under_review = 'قيد المراجعة'

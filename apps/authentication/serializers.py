@@ -8,7 +8,7 @@ from .email_message import (
 from django.contrib.auth.hashers import make_password
 from rest_framework.authtoken.models import Token
 from .models import CodeActivate
-from project.apps.users.models import Profile
+from apps.users.models import Profile
 
 '''
     User Register Serializer 
