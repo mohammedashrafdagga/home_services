@@ -1,20 +1,18 @@
-from dotenv import load_dotenv
+from decouple import config
 from datetime import timedelta
 from pathlib import Path
 import os
 
 
-# loading env variable 
-load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent / 'project'
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG') == 'True'
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ['*']
 
@@ -81,11 +79,11 @@ WSGI_APPLICATION = "project.wsgi.application"
 DATABASES = {
 'default': {
     'ENGINE': 'django.db.backends.postgresql',
-    'NAME': os.environ.get('DATABASE_NAME'),
-    'USER': os.environ.get('DATABASE_USER'),
-    'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
-    'HOST': os.environ.get('DATABASE_HOST'),
-    'PORT': os.environ.get('DATABASE_PORT')
+    'NAME': config('DATABASE_NAME'),
+    'USER': config('DATABASE_USER'),
+    'PASSWORD': config('DATABASE_PASSWORD'),
+    'HOST': config('DATABASE_HOST'),
+    'PORT': config('DATABASE_PORT')
 }
 }
 
