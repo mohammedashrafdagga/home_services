@@ -4,69 +4,65 @@ from .serializers import (
     UserRegistrationSerializer,
      ChangePasswordSerializer,
     ResetPasswordSerializer,
-    ResendCodeSerializer,
-    ResetPasswordRequestSerializer,
-    VerifyRestPasswordCodeSerializer,
+    SendCodeSerializer,
     VerifyCodeSerializer
     )
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.response import Response 
-
+from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from .utils import (
+    create_activation_code, check_activation_code,
+    activate_account, rest_password_request, generate_token,
+    get_user_by_token, delete_token
+)
+from .email_message import send_change_password_email
 
 
-'''
-    User register Account - allow user to create account into system
-'''
+
+# allow user to create account into system
 class UserRegisterAPIView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserRegistrationSerializer
     permission_classes = [AllowAny]
-    
-    
-    def post(self, request, *args, **kwargs):
+    serializer_class = UserRegistrationSerializer
+    def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response({
-                'detail': 'The Account is create, must activate account to used'
-            }, status=201)
-        return Response(serializer.errors, status=400)
-        
-        
-'''
-    endpoint for verifying code send to user to activate account
-'''
+        if serializer.is_valid():
+            user = serializer.save()
+            user.username = request.data['email']
+            user.save()
+            create_activation_code(user)
+            return Response({'detail': 'الحساب ثم إنشاؤه بالفعل, قم بتفعيل الحساب'}, status=201)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# verify code user enter to activate code
 class  UserVerifyingCodeAPIView(generics.GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = VerifyCodeSerializer
     def post(self, request):
-        serializer = VerifyCodeSerializer(data=request.data)
-        if serializer.is_valid():
-            return Response({'detail': 'Account activated successfully, can login into app'})
-        return Response(serializer.errors, status=400)
+        user = check_activation_code(request.data['code'])
+        if user is not None:
+            activate_account(user=user)
+            return Response({'detail': 'الحساب ثم تفعيله, قم بتسحيل الدخول'})
+
+        return Response({'detail': 'الكود الذي قمت بإدخاله غير صحيح'}, status=400)
         
-        
-'''
-    Allow to user to send in another time Code to email
-'''
+# allow to user to request sending code into email
 class  UserResendCodeAPIView(generics.GenericAPIView):
     permission_classes = [AllowAny]
-    serializer_class = ResendCodeSerializer
+    serializer_class = SendCodeSerializer
     
     def post(self, request):
-        serializer = ResendCodeSerializer(data = request.data)
+        serializer = SendCodeSerializer(data = request.data)
         if serializer.is_valid():
+            user = User.objects.get(email = serializer.validated_data['email'])
+            create_activation_code(user)
             return Response(
-                {'detail':'Code is sending into you email, checkout!!'}
+                {'detail':'كود التفعيل تم إرساله عبر الإيميل، تفقد ذلك'}
             )
         return Response(serializer.errors, status=400)
   
-  
-        
-'''
-    Allow to User to Change Password 
-'''
+# allow to user to change password 
 class  ChangePasswordAPIView(generics.GenericAPIView):
     serializer_class =  ChangePasswordSerializer
     permission_classes = [IsAuthenticated]
@@ -76,24 +72,24 @@ class  ChangePasswordAPIView(generics.GenericAPIView):
         serializer = ChangePasswordSerializer(data=request.data,
                                               context={'request': request})
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response({'detail': 'Password changed successfully'})
+            serializer.update(instance=request.user, validated_data=serializer.validated_data)
+            send_change_password_email(content = {'email': request.user.email})
+            return Response({'detail': 'ثم تغيير كلمة المرور بنجاح'})
 
         return Response(serializer.errors, status=400)
     
 
-'''
-    Allow To User when forget password, request to reset password
-'''
+
 class  RestPasswordRequestCodeAPIView(generics.GenericAPIView):
     permission_classes = [AllowAny]
-    serializer_class = ResetPasswordRequestSerializer
+    serializer_class = SendCodeSerializer
 
     def post(self, request):
-        serializer = ResetPasswordRequestSerializer(data = request.data)
+        serializer = SendCodeSerializer(data = request.data)
         serializer.is_valid(raise_exception=True)
+        rest_password_request(email = serializer.validated_data['email'])
         return Response(
-                {'detail': 'activation code is sending into your email'}
+                {'detail': 'كود التاكيد ثم إرساله عبر الإيميل، تفقد إيميلك'}
             )
         
 '''
@@ -101,19 +97,17 @@ class  RestPasswordRequestCodeAPIView(generics.GenericAPIView):
 '''
 class  VerifyingResetPasswordCodeAPIView(generics.GenericAPIView):
     permission_classes = [AllowAny]
-    serializer_class = VerifyRestPasswordCodeSerializer
+    serializer_class = VerifyCodeSerializer
     
     def post(self, request):
-        serializer = VerifyRestPasswordCodeSerializer(data=request.data)
-        
-        if serializer.is_valid(raise_exception=True):
-            token = serializer.create_token()
-            print(token)
+        user = check_activation_code(code=request.data['code'])
+        if user is not None:
+            token = generate_token(user=user)
             return Response({
-                    'detail': 'you allow to enter new password and confirm new password',
+                    'detail': 'يمكن الإن تحديث كلمة المرور',
                     'token': token
                 })
-        return Response(serializer.error_messages, status=400)
+        return Response({'detail': 'الكود الذي قمت بإدخال غير صحيح'})
         
         
 '''
@@ -126,7 +120,9 @@ class  ResetPasswordAPIView(generics.GenericAPIView):
     def post(self, request):
         serializer = ResetPasswordSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response({'detail': 'Password Reset successfully'})
+            user = get_user_by_token(key_token=serializer.validated_data['token'])
+            serializer.update(instance=user, validated_data=serializer.validated_data)
+            delete_token(user=user)
+            return Response({'detail': 'تم تحديث كلمة المرور بنجاح'})
         return Response(serializer.errors, status=400)
     
