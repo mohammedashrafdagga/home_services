@@ -2,84 +2,41 @@
 from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
+from typing import Dict
 
 
-def send_activation_email(user, activation_code):
+def email_sending(context:Dict):
+    message = render_to_string(template_name=context['template_name'], context=context['message_context'])
+    send_mail(context['message_context']['title'], message='', from_email=settings.EMAIL_HOST_USER,
+              recipient_list=context['email_to'], html_message=message)
     
-    '''
-        This for Sending Message Contains Activation Code for the User
-    '''
-    template = 'email_message/activate_code.html'
-    subject = 'Account Activation'
-    context = {
-        "title": subject,
-        "activation_code": activation_code
+
+# sending activation email
+def send_activation_email(content:Dict):
+    context =  {
+    'email_to': [content['email']], 'template_name':  'email_message/activate_code.html',
+    'message_context': {'title': 'Code for activate you account','activation_code': content['code']}}
+    email_sending(context=context)
+
+# sending email for successfully activate account into user
+def send_activation_thank_email(content):
+    context =  {
+    'template_name': 'email_message/is_activate.html','email_to': [content['email']],
+    'message_context': {'title': 'Thank for Activation your Account'}}
+    email_sending(context=context)
+
+
+# sending email for Changing Password successfully message 
+def send_change_password_email(content):
+    context =  {
+    'template_name': 'email_message/change_password.html', 'email_to': [content['email']],
+    'message_context': {'title': 'Change Password is Update Successfully'}
     }
-    html_content = render_to_string(template, context)
-    from_email = settings.EMAIL_HOST_USER
-    to_email = user.email
-    send_mail(subject, message='', from_email=from_email, recipient_list=[to_email], html_message=html_content)
+    email_sending(context=context)
 
-
-
-
-def thank_activation_email(user):
-    
-    '''
-        This for Sending Message For thank User for Activate Account
-    '''
-    template = 'email_message/is_activate.html'
-    subject = 'Thank for activation your account '
-    context = {
-        "title": subject,
-    }
-    html_content = render_to_string(template, context)
-    from_email = settings.EMAIL_HOST_USER
-    to_email = user.email
-    send_mail(subject, message='', from_email=from_email, recipient_list=[to_email], html_message=html_content)
-
-def resend_activation_email(user, activation_code):
-    
-    '''
-        This for Sending Message Contains Activation Code for the User
-    '''
-    template = 'email_message/activate_code.html'
-    subject = 'Resend Code for Account Activation'
-    context = {
-        "title": subject,
-        "activation_code": activation_code
-    }
-    html_content = render_to_string(template, context)
-    from_email = settings.EMAIL_HOST_USER
-    to_email = user.email
-    send_mail(subject, message='', from_email=from_email, recipient_list=[to_email], html_message=html_content)
-
-def change_password_email(user):
-    '''
-        Change Password Successfully sending email
-    '''
-    template = 'email_message/change_password.html'
-    subject = 'Change Password Successfully'
-    html_content = render_to_string(template, {
-        "title": subject
-    })
-    from_email = settings.EMAIL_HOST_USER
-    to_email = user.email
-    send_mail(subject, message='', from_email=from_email, recipient_list=[to_email], html_message=html_content)
-
-
-def reset_password_code_email(email, reset_password_code):
-    
-    '''
-        This for Sending Message Contains resetpassword Code for the User
-    '''
-    template = 'email_message/reset_password.html'
-    subject = 'Resend Code for reset password'
-    context = {
-        "title": subject,
-        "reset_password_code": reset_password_code
-    }
-    html_content = render_to_string(template, context)
-    from_email = settings.EMAIL_HOST_USER
-    to_email = email
-    send_mail(subject, message='', from_email=from_email, recipient_list=[to_email], html_message=html_content)
+# sending email for resend Code for rest password
+def reset_password_code_email(content:Dict):
+    context =  {
+    'template_name':  'email_message/reset_password.html', 'email_to': [content['email']],
+    'message_context': {'title': 'resend Code for apply to reset password', "reset_password_code": content['code']}}
+    email_sending(context=context)
