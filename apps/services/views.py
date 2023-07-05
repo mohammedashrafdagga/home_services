@@ -3,11 +3,21 @@ from .models import Category, Services
 from .serializers import (
     CategorySerializer,
     CategoryWithServicesSerializer,
-    ServicesSerializer
+    ServicesSerializer,
+    ServicesDetailSerializer
 )
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
+
+class LatestServicesListAPIView(generics.ListAPIView):
+    queryset = Services.objects.all()
+    serializer_class = ServicesSerializer
+    permission_classes = [AllowAny]
+    
+    def get_queryset(self):
+        return super().get_queryset().order_by('-create_at')[:10]
+    
 class CategoryListAPIView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -29,6 +39,19 @@ class CategoryListServicesAPIView(generics.GenericAPIView):
 
 class ServicesDetailView(generics.RetrieveAPIView):
     queryset = Services.objects.all()
-    serializer_class = ServicesSerializer
+    serializer_class = ServicesDetailSerializer
     lookup_field = 'id'
+    
+    
+class SearchServicesAPIView(generics.ListAPIView):
+    queryset = Services.objects.all()
+    serializer_class = ServicesSerializer
+    permission_classes = [AllowAny]
+    
+    def get_queryset(self):
+        q = self.request.GET.get('q')
+        queryset = super().get_queryset()
+        if q is not None:
+            return queryset.filter(name__icontains = q).all()
+        return queryset
     

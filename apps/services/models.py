@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
 # Category Model
 class Category(models.Model):
     created_by = models.ForeignKey(User,
@@ -43,9 +42,8 @@ class Services(models.Model):
     
     def __str__(self):
         return self.name
-    
-    
-    
+
+
 class IncludeServices(models.Model):
     services = models.ForeignKey(Services,related_name='include_services',
                                  on_delete=models.SET_NULL, null=True, blank=True)

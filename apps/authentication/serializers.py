@@ -67,7 +67,7 @@ class ChangePasswordSerializer(PasswordSerializerMixin, serializers.Serializer):
     def validate_old_password(self, value):
         user = self.context['request'].user
         if not user.check_password(value):
-            raise serializers.ValidationError(detail='كلمة المرور الحالية خاظئة')
+            raise serializers.ValidationError(detail='خطا في إدخال كلمة المرور')
         return value
 
 
