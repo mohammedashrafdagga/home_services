@@ -47,7 +47,7 @@ class ServiceProvider(models.Model):
 
 class CustomServices(models.Model):
     request_by = models.ForeignKey(User, related_name='custom_services', on_delete=models.CASCADE)
-    name = models.CharField()
+    name = models.CharField(max_length=250)
     category = models.ForeignKey(Category, models.CASCADE)
     descriptions = models.TextField()    
     request_date = models.DateField()
