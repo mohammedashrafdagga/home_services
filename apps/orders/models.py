@@ -35,3 +35,4 @@ class Order(models.Model):
     
     def __str__(self):
         return f'طلب خدمة {self.service} بتاريخ {self.date_order}'
+    

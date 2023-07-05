@@ -40,3 +40,16 @@ def reset_password_code_email(content:Dict):
     'template_name':  'email_message/reset_password.html', 'email_to': [content['email']],
     'message_context': {'title': 'resend Code for apply to reset password', "reset_password_code": content['code']}}
     email_sending(context=context)
+    
+# Send Code for Change Email 
+def send_emailing_change_email(content:Dict):
+    context =  {
+    'template_name':  'email_message/change_email.html', 'email_to': [content['email']],
+    'message_context': {'title': 'Code for verify new email adding', "code": content['code']}}
+    email_sending(context=context)
+    
+def send_successfully_change_email(content:Dict):
+    context =  {
+    'template_name':  'email_message/change_successfully_email.html', 'email_to': [content['email']],
+    'message_context': {'title': 'Your Change Email Successfully'}}
+    email_sending(context=context)

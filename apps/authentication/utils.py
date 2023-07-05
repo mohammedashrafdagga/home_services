@@ -1,6 +1,8 @@
 import random
 from .models import CodeActivate
-from .email_message import send_activation_email, send_activation_thank_email, reset_password_code_email
+from .email_message import (
+    send_activation_email, send_activation_thank_email,
+    reset_password_code_email, send_emailing_change_email, send_successfully_change_email)
 from apps.users.models import Profile
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
@@ -58,3 +60,10 @@ def get_user_by_token(key_token:str):
     user = Token.objects.get(key = key_token).user
     Token.objects.get(key = key_token)
     return user
+
+
+def send_change_email(context):
+    code = generate_activation_code(user = context['user'])
+    CodeActivate.objects.create(user = context['user'], code = code)
+    send_emailing_change_email(content = {'email': context['new_email'], 'code': code})
+    

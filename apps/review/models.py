@@ -4,9 +4,16 @@ from apps.services.models import Services
 
 # Create your models here.
 class Review(models.Model):
+    RATING_CHOICES = (
+        (1, '1'),
+        (2, '2'),
+        (3, '3'),
+        (4, '4'),
+        (5, '5'),
+    )
     user = models.ForeignKey(User, related_name='reviews',on_delete=models.CASCADE)
     service = models.ForeignKey(Services, related_name='reviews', on_delete=models.CASCADE)
-    review = models.PositiveSmallIntegerField()
+    review = models.IntegerField(choices=RATING_CHOICES,default=1)
     comment = models.TextField(blank=True, null=True)
     
     # created at & implementation at

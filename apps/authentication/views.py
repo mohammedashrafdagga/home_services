@@ -28,7 +28,8 @@ class UserRegisterAPIView(generics.CreateAPIView):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            user.username = request.data['email']
+            user.username = serializer.validated_data['email']
+            user.set_password(serializer.validated_data['password'])
             user.save()
             create_activation_code(user)
             return Response({'detail': 'الحساب ثم إنشاؤه بالفعل, قم بتفعيل الحساب'}, status=201)

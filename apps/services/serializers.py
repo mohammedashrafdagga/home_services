@@ -1,11 +1,16 @@
 from .models import Category, Services, IncludeServices, NotIncludeServices
 from rest_framework import serializers
+from apps.review.serializer import ReviewSerializer
 
-class ServicesCategorySerializer(serializers.ModelSerializer):  
-    detail = serializers.HyperlinkedIdentityField(read_only=True, view_name='services:detail',lookup_field = 'id')
+class ServicesSerializer(serializers.ModelSerializer):  
+    detail = serializers.HyperlinkedIdentityField(
+        read_only=True,
+        view_name='services:detail',
+        lookup_field = 'id'
+    )
     class Meta:
         model = Services
-        fields = ('name', 'image', 'price_from', 'price_to', 'detail',)
+        fields = ('name', 'image', 'price_from', 'price_to','detail',)
     
 
 
@@ -25,7 +30,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class CategoryWithServicesSerializer(serializers.ModelSerializer):
-    services = ServicesCategorySerializer(many=True, read_only=True)
+    services = ServicesSerializer(many=True, read_only=True)
     class Meta:
         model = Category
         fields = ('name', 'icon', 'services',)
@@ -43,9 +48,12 @@ class NotIncludeServicesSerializer(serializers.ModelSerializer):
         fields = ('descriptions',)
         
 
-class ServicesSerializer(serializers.ModelSerializer):
+class ServicesDetailSerializer(serializers.ModelSerializer):
     include_services = IncludeServicesSerializer(many=True, read_only=True)
     not_include_services = NotIncludeServicesSerializer(many=True, read_only=True)
+    reviews = ReviewSerializer(many=True, read_only=True)
     class Meta:
         model = Services
-        fields = ('id','name','image' ,'price_from','price_to', 'include_services', 'not_include_services',)
+        fields = ('id','name','image' ,'price_from','price_to', 'include_services', 'not_include_services','reviews', )
+        
+        
