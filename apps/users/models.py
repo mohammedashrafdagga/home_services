@@ -32,7 +32,7 @@ class ChangeEmail(models.Model):
     
 # (name, email, phone_number, location, category, year_experience, explain_experience, additional)
 class ServiceProvider(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=180)
     phone_number = models.CharField(max_length=15)
     location = models.CharField(max_length=250)
