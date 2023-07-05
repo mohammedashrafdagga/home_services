@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from apps.services.models import Category
+from django.utils.timezone import now
 
 
 class Profile(models.Model):
@@ -49,8 +50,8 @@ class CustomServices(models.Model):
     request_by = models.ForeignKey(User, related_name='custom_services', on_delete=models.CASCADE)
     name = models.CharField(max_length=250)
     category = models.ForeignKey(Category, models.CASCADE)
-    descriptions = models.TextField()    
-    request_date = models.DateField()
+    descriptions = models.TextField(null=True, blank=True)    
+    request_date = models.DateField(default=now)
     request_time = models.TimeField()
     location = models.OneToOneField(Location, on_delete=models.CASCADE)
 
