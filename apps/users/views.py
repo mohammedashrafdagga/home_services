@@ -3,7 +3,8 @@ from .models import Location, Profile, ChangeEmail
 from .serializers import (
     LocationSerializer, ProfileSerializer,
     PasswordSerializer, ChangeEmailSerializer, EditUserSerializer,
-    CustomServicesSerializer, ServiceProviderSerializer
+    CustomServicesSerializer, ServiceProviderSerializer,
+    UserInformationSerializer
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -168,3 +169,11 @@ class CreateServicesProviderAPIView(generics.CreateAPIView):
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+# For Getting User Information
+class UserInformationAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    def get(self, request):
+        serializer = UserInformationSerializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)

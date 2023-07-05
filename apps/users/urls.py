@@ -6,12 +6,15 @@ from .views import (
     VerifyCodeChangeEmailAPIView,
     EditUserInformationAPIView,
     CreateCustomServicesAPIView,
-    CreateServicesProviderAPIView
+    CreateServicesProviderAPIView,
+    UserInformationAPIView
+
 )
 
 app_name = 'users'
 
 urlpatterns = [
+    path('user-data/', UserInformationAPIView.as_view(), name='user-data'),
     path('verify-password/', VerifyPasswordAPIView.as_view(), name='verify-password'),
     path('change-email/', ChangeEmailAPIView.as_view(), name='change-email'),
     path('verify-new-email/', VerifyCodeChangeEmailAPIView().as_view(), name='verify-new-email'),

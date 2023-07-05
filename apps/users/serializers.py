@@ -86,7 +86,14 @@ class EditUserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('first_name', 'last_name', )
         
-        
+class UserInformationSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email', 'image',)
+    
+    def get_image(self, obj):
+        return obj.profile.image.url
 
 class CustomServicesSerializer(serializers.ModelSerializer):
     class Meta:
