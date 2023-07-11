@@ -30,7 +30,7 @@ class CustomOrderSerializer(serializers.ModelSerializer):
         read_only_fields = ('create_by',)
     
     def get_service_name(self, obj):
-        return str(obj.service.name)
+        return "خدمة مخصصة"
     
     def get_total_price(self, obj):
         return obj.quantity * obj.product.price
