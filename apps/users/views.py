@@ -17,8 +17,7 @@ from rest_framework import status
 from apps.authentication.utils import send_change_email, check_activation_code
 from apps.authentication.email_message import send_successfully_change_email
 from apps.authentication.serializers import VerifyCodeSerializer
-from apps.orders.models import Order
-from apps.services.models import Services
+from apps.orders.models import CustomOrder
 
 
 class LocationMixin():
@@ -131,16 +130,12 @@ class CreateCustomServicesAPIView(generics.GenericAPIView):
         serializer = CustomServicesSerializer(data = request.data)
         if serializer.is_valid():
             custom_service = serializer.save(request_by = request.user)
-            name = f"{custom_service.name}-{serializer.validated_data['request_date']}-{request.user.id}"
+            name = f"{custom_service.name}-{custom_service.id}-{request.user.id}"
             service_slug = name.strip().lower().replace(' ', '-')
-            service = Services.objects.create(
-                created_by = request.user,
-                name = name,
-                category = serializer.validated_data['category'],
-                slug = service_slug
-            )
-            order = Order.objects.create(create_by = request.user,
-                service = service, date_order = serializer.validated_data['request_date'],
+            custom_service.slug = service_slug
+            custom_service.save()
+            order = CustomOrder.objects.create(create_by = request.user,
+                service = custom_service, date_order = serializer.validated_data['request_date'],
                 time_order = serializer.validated_data['request_time'])
             return Response(
                 {'detail': {

@@ -49,13 +49,13 @@ class ServiceProvider(models.Model):
 class CustomServices(models.Model):
     request_by = models.ForeignKey(User, related_name='custom_services', on_delete=models.CASCADE)
     name = models.CharField(max_length=250)
+    slug = models.SlugField(null=True, blank=True)
     category = models.ForeignKey(Category, models.CASCADE)
     descriptions = models.TextField(null=True, blank=True)    
     request_date = models.DateField(default=now)
     request_time = models.TimeField()
-    location = models.OneToOneField(Location, on_delete=models.CASCADE)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'custom order services for {self.request_by.username}'
-    
+        return f"خدمة مخصصة للمستخدم {self.request_by.username}"
     
