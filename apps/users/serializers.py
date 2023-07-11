@@ -99,7 +99,7 @@ class CustomServicesSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomServices
         fields ='__all__'
-        read_only_fields = ('request_by',)
+        read_only_fields = ('request_by','slug',)
         
         
 class ServiceProviderSerializer(serializers.ModelSerializer):

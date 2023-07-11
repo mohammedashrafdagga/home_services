@@ -2,7 +2,18 @@ from django.contrib import admin
 from .models import Location, Profile, CustomServices, ServiceProvider
 
 # Register your models here.
-admin.site.register(Location)
+@admin.register(Location)
+class LocationAdmin(admin.ModelAdmin):
+    list_display = ['id','user', 'country','city']
+    
+    
+@admin.register(CustomServices)
+class CustomServicesAdmin(admin.ModelAdmin):
+    list_display = ['id','request_by', 'name','category','request_date', 'location']
+    
+    
 admin.site.register(Profile)
-admin.site.register(CustomServices)
-admin.site.register(ServiceProvider)
+
+@admin.register(ServiceProvider)
+class ServiceProviderAdmin(admin.ModelAdmin):
+    list_display = ['name','location','phone_number', 'category','year_experience','summary_experience']
