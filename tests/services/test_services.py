@@ -3,6 +3,9 @@ from django.test import Client
 from apps.services.models import Services, Category
 from django.urls import reverse
 
+from django.utils import timezone
+
+
 @pytest.mark.django_db
 def test_get_all_services_with_search():
     # Create a client for making requests
