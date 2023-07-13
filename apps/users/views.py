@@ -60,7 +60,7 @@ class ProfileImageView(APIView):
             serializer.save()
             return Response(serializer.data)
 
-        return Response({'message': 'Image or user not provided.'}, status=400)
+        return Response(serializer.errors, status=400)
 
 # Verify password for user
 class VerifyPasswordAPIView(generics.GenericAPIView):
@@ -98,11 +98,12 @@ class VerifyCodeChangeEmailAPIView(generics.GenericAPIView):
     def post(self, request):
         user = check_activation_code(code = request.data['code'])
         if user is not None:
-            new_email = ChangeEmail.objects.get(user=request.user).new_email
-            user.email = new_email
-            user.username = new_email
+            user_email = ChangeEmail.objects.filter(user=request.user).first()
+            user.email = user_email.new_email
+            user.username = user_email.new_email
             user.save()
-            send_successfully_change_email(content={'email': new_email})
+            ChangeEmail.objects.filter(user = request.user).delete()
+            send_successfully_change_email(content={'email': user_email.new_email})
             return Response({'detail': 'ثم تحديث البريد الإكتروني الخاص بك بنجاح'}, status=status.HTTP_200_OK)
         return Response({'detail': 'إدخال كود التفعيل الخاطئ'}, status=status.HTTP_400_BAD_REQUEST)
     
@@ -160,7 +161,7 @@ class CreateServicesProviderAPIView(generics.CreateAPIView):
                     {'detail': {
                         'status': 'تم إنشاء طلب لتقديم الخدمات عبر التطبيق بنجاح',
                         'services': serializer.validated_data
-                    }}, status=status.HTTP_200_OK
+                    }}, status=status.HTTP_201_CREATED
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

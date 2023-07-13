@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Location, Profile, CustomServices, ServiceProvider
+from .models import Location, Profile, CustomServices, ServiceProvider, ChangeEmail
 
 # Register your models here.
 @admin.register(Location)
@@ -17,3 +17,6 @@ admin.site.register(Profile)
 @admin.register(ServiceProvider)
 class ServiceProviderAdmin(admin.ModelAdmin):
     list_display = ['name','location','phone_number', 'category','year_experience','summary_experience']
+    
+    
+admin.site.register(ChangeEmail)
