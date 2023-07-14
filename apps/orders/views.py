@@ -1,10 +1,10 @@
 from rest_framework import generics
 from rest_framework.response import Response
-from .models import Order, CustomOrder
+from .models import Order, CustomOrder, Notification
 from .models import (
-    under_review, underway
+    under_review, underway, complete, rejected
 )
-from .serializer import OrderSerializer, CustomOrderSerializer
+from .serializer import OrderSerializer, CustomOrderSerializer, NotificationSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
@@ -39,4 +39,74 @@ class OrderCreateAPIView(generics.CreateAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+
+
+# return only reading All Notification (Last 5)
+class ReadNotificationsAPIView(generics.ListAPIView):
+    queryset = Notification
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
     
+    def get_queryset(self):
+        return Notification.objects.filter(user = self.request.user, status = 'مقروءة')[:5]
+    
+# return only unreading All Notification and  (Last 5)
+class NonReadNotificationsAPIView(generics.ListAPIView):
+    queryset = Notification
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    
+    def get_queryset(self):
+        orders = Order.objects.filter(create_by = self.request.user)
+        custom_order = CustomOrder.objects.filter(create_by = self.request.user)
+        un_read_order = Notification.objects.filter(user = self.request.user, status = 'غير مقروءة', order__in = orders)
+        un_read_custom_order = Notification.objects.filter(user = self.request.user,
+                                                           status = 'غير مقروءة', custom_order__in = custom_order)
+        
+        for un_order in un_read_order:
+            if un_order.order_status != un_order.order.order_status:
+                if un_order.order_status == underway:
+                    un_order.text = f'الطلب {un_order.service.name} قيد التنفيذ الأن'
+                    un_order.order_status = underway
+                    un_order.save()
+                if un_order.order_status == complete:
+                    un_order.text = f'الطلب {un_order.service.name} اصبح مكتمل الأن'
+                    un_order.order_status = complete
+                    un_order.save()
+            
+                if un_order.order_status == rejected:
+                    un_order.text = f'تم رفض طلب {un_order.service.name}'
+                    un_order.order_status = rejected
+                    un_order.save()
+                
+        for un_order in un_read_custom_order:
+            if un_order.order_status != un_order.custom_order.order_status:
+                if un_order.order_status == underway:
+                    un_order.text = f'الطلب {un_order.service.name} قيد التنفيذ الأن'
+                    un_order.order_status = underway
+                    un_order.save()
+                if un_order.order_status == complete:
+                    un_order.text = f'الطلب {un_order.service.name} اصبح مكتمل الأن'
+                    un_order.order_status = complete
+                    un_order.save()
+            
+                if un_order.order_status == rejected:
+                    un_order.text = f'تم رفض طلب {un_order.service.name}'
+                    un_order.order_status = rejected
+                    un_order.save()
+        return Notification.objects.filter(user = self.request.user, status = 'غير مقروءة')
+    
+    
+class ChangeNotificationAPIView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    
+    def post(self, request):
+        unread_notification = Notification.objects.filter(user = request.user, status = 'غير مقروءة')
+        for notification in unread_notification:
+            notification.status = 'مقروءة'
+            notification.save()
+            
+        return Response(status=200)

@@ -72,3 +72,23 @@ class CustomOrder(models.Model):
     def __str__(self):
         return f'طلب خدمة {self.service} بتاريخ {self.date_order}'
     
+
+class Notification(models.Model):
+    NOTIFICATION_STATUS = (
+        ('غير مقروءة', 'غير مقروءة'),
+        ('مقروءة','مقروءة')
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE,null=True, blank=True, related_name='notifications')
+    custom_order = models.ForeignKey(CustomOrder, on_delete=models.CASCADE,null=True, blank=True, related_name='notifications')
+    text = models.TextField()
+    order_status = models.CharField(max_length=15)
+    status = models.CharField(default='غير مقروءة', max_length=10, choices=NOTIFICATION_STATUS)
+    create_at = models.DateTimeField(auto_now_add=True)
+    
+    
+    def __str__(self):
+        return self.text
+    
+    class Meta:
+        ordering = ('-create_at',)
