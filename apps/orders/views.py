@@ -61,12 +61,14 @@ class NonReadNotificationsAPIView(generics.ListAPIView):
     def get_queryset(self):
         orders = Order.objects.filter(create_by = self.request.user)
         custom_order = CustomOrder.objects.filter(create_by = self.request.user)
-        un_read_order = Notification.objects.filter(user = self.request.user, status = 'غير مقروءة', order__in = orders)
+        un_read_order = Notification.objects.filter(user = self.request.user,order__in = orders)
         un_read_custom_order = Notification.objects.filter(user = self.request.user,
-                                                           status = 'غير مقروءة', custom_order__in = custom_order)
+                                                           custom_order__in = custom_order)
         
         for un_order in un_read_order:
             if un_order.order_status != un_order.order.order_status:
+                if un_order.status == 'مقروءة':
+                    un_order.status = 'غير مقروءة'
                 if un_order.order_status == underway:
                     un_order.text = f'الطلب {un_order.service.name} قيد التنفيذ الأن'
                     un_order.order_status = underway
@@ -83,6 +85,9 @@ class NonReadNotificationsAPIView(generics.ListAPIView):
                 
         for un_order in un_read_custom_order:
             if un_order.order_status != un_order.custom_order.order_status:
+                if un_order.status == 'مقروءة':
+                    un_order.status = 'غير مقروءة'
+                    
                 if un_order.order_status == underway:
                     un_order.text = f'الطلب {un_order.service.name} قيد التنفيذ الأن'
                     un_order.order_status = underway
