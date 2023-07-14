@@ -29,7 +29,7 @@ class NotIncludeServicesAdmin(admin.TabularInline):
 
 # Services Admin
 class ServicesAdmin(admin.ModelAdmin):
-    list_display = ['category','name', 'slug']
+    list_display = ['id','category','name', 'slug']
     inlines = [IncludeServicesAdmin, NotIncludeServicesAdmin]
 
     def save_model(self, request, obj, form, change):

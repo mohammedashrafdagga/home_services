@@ -17,7 +17,7 @@ from rest_framework import status
 from apps.authentication.utils import send_change_email, check_activation_code
 from apps.authentication.email_message import send_successfully_change_email
 from apps.authentication.serializers import VerifyCodeSerializer
-from apps.orders.models import CustomOrder
+from apps.orders.models import CustomOrder, Notification
 
 
 class LocationMixin():
@@ -137,6 +137,11 @@ class CreateCustomServicesAPIView(generics.GenericAPIView):
             order = CustomOrder.objects.create(create_by = request.user,
                 service = custom_service, date_order = serializer.validated_data['request_date'],
                 time_order = serializer.validated_data['request_time'])
+            Notification.objects.create(
+            user = request.user,
+            custom_order = order,
+            order_status = order.order_status,
+            text = f"تم طلب خدمة مخصصة جديدة بنجاح")
             return Response(
                 {'detail': {
                     'status': 'تم إنشاء طلب خدمة مخصصة بنجاح',

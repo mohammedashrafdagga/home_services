@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Order, CustomOrder
+from .models import Order, CustomOrder, Notification
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -18,7 +18,14 @@ class OrderSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context.get('request').user
         validated_data['create_by'] = user
-        return super().create(validated_data)
+        order = super().create(validated_data)
+        Notification.objects.create(
+            user = user,
+            order = order,
+            order_status = validated_data['order_status'],
+            text = f"تم طلب الخدمة ' {order.service.name} ' بنجاح"
+        )
+        return order
     
 
 
@@ -35,3 +42,9 @@ class CustomOrderSerializer(serializers.ModelSerializer):
     def get_total_price(self, obj):
         return obj.quantity * obj.product.price
        
+       
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ('id','text', 'order_status')
+    
