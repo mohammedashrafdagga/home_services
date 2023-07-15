@@ -137,7 +137,7 @@ class CreateCustomServicesAPIView(generics.GenericAPIView):
             custom_service.save()
             order = CustomOrder.objects.create(create_by = request.user,
                 service = custom_service, date_order = serializer.validated_data['request_date'],
-                time_order = serializer.validated_data['request_time'])
+                time_order = serializer.validated_data['request_time'], location = custom_service.location)
             Notification.objects.create(
             user = request.user,
             custom_order = order,
