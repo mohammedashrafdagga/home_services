@@ -1,6 +1,6 @@
 from django.db import models
 from apps.services.models import Services
-from apps.users.models import CustomServices
+from apps.users.models import CustomServices, Location
 from django.contrib.auth.models import User
 
 under_review = 'قيد المراجعة'
@@ -30,6 +30,8 @@ class Order(models.Model):
     
     date_order = models.DateField()
     time_order = models.TimeField()
+    
+    location= models.ForeignKey(Location, models.SET_NULL, null=True, blank=True)
     
     # created at & implementation at
     create_at = models.DateTimeField(auto_now_add=True)
@@ -64,6 +66,8 @@ class CustomOrder(models.Model):
     date_order = models.DateField()
     time_order = models.TimeField()
     
+    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
+
     # created at & implementation at
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)

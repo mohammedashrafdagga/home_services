@@ -4,7 +4,7 @@ from .models import Location, Profile, CustomServices, ServiceProvider, ChangeEm
 # Register your models here.
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
-    list_display = ['id','user', 'country','city']
+    list_display = ['id','address_name','user', 'country','city']
     
     
 @admin.register(CustomServices)
