@@ -1,50 +1,38 @@
 from rest_framework import serializers
-from .models import Order, CustomOrder, Notification
-
+from .models import Order, Review, complete
+from apps.users.serializers import UserSerializer
 
 class OrderSerializer(serializers.ModelSerializer):
     service_name = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Order
         fields = '__all__'
-        read_only_fields = ('create_by',)
+        read_only_fields = ('user',)
     
+    # for Getting Services Name
     def get_service_name(self, obj):
         return str(obj.service.name)
     
-    def get_total_price(self, obj):
-        return obj.quantity * obj.product.price
-       
+    # define user for order
     def create(self, validated_data):
-        user = self.context.get('request').user
-        validated_data['create_by'] = user
-        order = super().create(validated_data)
-        Notification.objects.create(
-            user = user,
-            order = order,
-            order_status = validated_data['order_status'],
-            text = f"تم طلب الخدمة ' {order.service.name} ' بنجاح"
-        )
-        return order
+        validated_data['user'] = self.context.get('request').user
+        return super().create(validated_data)
     
+    
+#  Review for Ordering
 
-
-class CustomOrderSerializer(serializers.ModelSerializer):
-    service_name = serializers.SerializerMethodField(read_only=True)
+class ReviewSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
     class Meta:
-        model = CustomOrder
+        model = Review
         fields = '__all__'
-        read_only_fields = ('create_by',)
+        read_only_fields  =('user',)
     
-    def get_service_name(self, obj):
-        return "خدمة مخصصة"
+    def validate(self, attrs):
+        if attrs.get('order').order_status != complete:
+            raise serializers.ValidationError(detail={'detail': "can't allow to create review for non-complete order"})
+        return super().validate(attrs)
     
-    def get_total_price(self, obj):
-        return obj.quantity * obj.product.price
-       
-       
-class NotificationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Notification
-        fields = ('id','text', 'order_status')
-    
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)

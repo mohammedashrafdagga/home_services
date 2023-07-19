@@ -1,8 +1,9 @@
 from rest_framework import serializers
-from .models import Location, Profile, CustomServices, ServiceProvider
+from .models import Location, Profile
 from django.contrib.auth.models import User
 import os
 
+# Location Serializer 
 class LocationSerializer(serializers.ModelSerializer):
     detail = serializers.HyperlinkedIdentityField(
         read_only=True,
@@ -13,7 +14,6 @@ class LocationSerializer(serializers.ModelSerializer):
         model = Location
         fields = '__all__'
         read_only_fields = ('user','detail',)
-        #fields = ['id', 'user', 'country', 'city', 'building', 'apartment_number', 'phone_number']
 
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
@@ -24,13 +24,11 @@ class LocationSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
     
     
-
-   
-         
+# Profile User      
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = '__all__'
+        fields = ['image']
         read_only_fields = ('user',)
     
     
@@ -53,6 +51,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         
         return user.profile
         
+# Related With Reviews 
 class UserSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
     class Meta:
@@ -61,31 +60,14 @@ class UserSerializer(serializers.ModelSerializer):
     
     def get_image(self, obj):
         return obj.profile.image.url
-    
-class PasswordSerializer(serializers.Serializer):
-    password = serializers.CharField(required=True, write_only=True)
-
-    def validate_password(self, value):
-        user = self.context['request'].user
-        if not user.check_password(value):
-            raise serializers.ValidationError(detail='خطا في إدخال كلمة المرور')
-        return value
-
-
-class ChangeEmailSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True, write_only=True)
-    
-    def validate(self, data):
-        user = User.objects.filter(email = data.get('email')).first()
-        if user is not None:
-            raise serializers.ValidationError(detail={'detail': 'هذا الإيميل موجود بالفعل ,قمت بتجربة أخر'})
-        return data
-    
+ 
+# For editing only firstname and lastname
 class EditUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('first_name', 'last_name', )
         
+# Related with Settings Pages
 class UserInformationSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
     class Meta:
@@ -94,16 +76,3 @@ class UserInformationSerializer(serializers.ModelSerializer):
     
     def get_image(self, obj):
         return obj.profile.image.url
-
-class CustomServicesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomServices
-        fields ='__all__'
-        read_only_fields = ('request_by','slug',)
-        
-        
-class ServiceProviderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ServiceProvider
-        fields = '__all__'
-        read_only_fields = ('user',)
