@@ -15,49 +15,41 @@ class Category(models.Model):
         return self.name
 
 
+    
 class Services(models.Model):
-    created_by = models.ForeignKey(User,
-                                   on_delete=models.SET_NULL, null=True, blank=True)
-    category = models.ForeignKey(Category, related_name='services' ,on_delete=models.SET_NULL, null=True, blank=True)
+    STATUS_CHOICES= (
+        ('fixed', 'fixed'),
+        ('custom', 'custom')
+    )
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    category = models.ForeignKey(Category, related_name='services', on_delete=models.SET_NULL, null=True, blank=True)
 
     # name with slug
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
     name_en = models.CharField(max_length=255, null=True, blank=True)
-    slug = models.CharField(max_length=255, null=True, blank=True)
+    content = models.TextField(null=True, blank=True)
+    slug = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    # status = models.CharField(max_length = 10,choices=STATUS_CHOICES, default='custom')
     
     # image services
-    image = models.ImageField(upload_to='services_images', default='services_images/services.png')
+    image = models.ImageField(upload_to='services_images', default='services_images/services.png', null=True, blank=True)
     
     # price
-    price_from = models.PositiveIntegerField(default=30)
-    price_to = models.PositiveIntegerField(default=50)
+    price_from = models.PositiveIntegerField(default=50)
+    price_to = models.PositiveIntegerField(default=250)
     
     # is active
     is_active = models.BooleanField(default=True)
+    
     
     # date for services
     create_at = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
     
+    # default Manger
+    objects = models.Manager()
+    # quest = ServicesManger() # custom manger
     
     def __str__(self):
         return self.name
 
-
-class IncludeServices(models.Model):
-    services = models.ForeignKey(Services,related_name='include_services',
-                                 on_delete=models.SET_NULL, null=True, blank=True)
-    descriptions = models.CharField(max_length=255)
-    
-    def __str__(self):
-        return self.descriptions
-    
-    
-    
-class NotIncludeServices(models.Model):
-    services = models.ForeignKey(Services,related_name='not_include_services',
-                                 on_delete=models.SET_NULL, null=True, blank=True)
-    descriptions = models.CharField(max_length=255)
-    
-    def __str__(self):
-        return self.descriptions

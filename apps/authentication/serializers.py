@@ -7,10 +7,10 @@ from .models import CodeActivate
 
 # User register Serializer
 class UserRegistrationSerializer(serializers.ModelSerializer):
-
+    is_active  = serializers.BooleanField(default=False, read_only=True)
     class Meta:
         model = User
-        fields = ['email', 'first_name', 'last_name','password']
+        fields = ['email', 'first_name', 'last_name','password', 'is_active']
         read_only_fields = ['username']
 
     def validate(self, attrs):

@@ -1,10 +1,13 @@
 from django.contrib import admin
 from django.contrib.auth.models import User, Group
+from .models import CodeActivate
 # from .models import CodeActivate
 
 
 # # # Register your models here.
-# # admin.site.register(CodeActivate)
+@admin.register(CodeActivate)
+class CodeActivateAdmin(admin.ModelAdmin):
+    list_display = ['user','code', 'status']
 # admin.site.unregister(User)
 admin.site.unregister(Group)
 

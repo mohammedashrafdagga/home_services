@@ -13,7 +13,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .utils import (
     create_activation_code, check_activation_code,
-    activate_account, rest_password_request, generate_token,
+     rest_password_request, generate_token,
     get_user_by_token, delete_token
 )
 from .email_message import send_change_password_email
@@ -31,7 +31,6 @@ class UserRegisterAPIView(generics.CreateAPIView):
             user.username = serializer.validated_data['email']
             user.set_password(serializer.validated_data['password'])
             user.save()
-            create_activation_code(user)
             return Response({'detail': 'الحساب ثم إنشاؤه بالفعل, قم بتفعيل الحساب'}, status=201)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -43,7 +42,8 @@ class  UserVerifyingCodeAPIView(generics.GenericAPIView):
     def post(self, request):
         user = check_activation_code(request.data['code'])
         if user is not None:
-            activate_account(user=user)
+            user.is_active = True
+            user.save()
             return Response({'detail': 'الحساب ثم تفعيله, قم بتسحيل الدخول'})
 
         return Response({'detail': 'الكود الذي قمت بإدخاله غير صحيح'}, status=400)

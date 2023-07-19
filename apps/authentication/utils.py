@@ -1,14 +1,14 @@
 import random
 from .models import CodeActivate
 from .email_message import (
-    send_activation_email, send_activation_thank_email,
-    reset_password_code_email, send_emailing_change_email, send_successfully_change_email)
+     send_activation_thank_email,
+    reset_password_code_email, send_emailing_change_email)
 from apps.users.models import Profile
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 
 # Generate Activation Code for User
-def generate_activation_code(user):
+def generate_activation_code():
     code = ""
     for _ in range(5):
         digit = random.randint(0, 9)
@@ -26,17 +26,10 @@ def check_activation_code( code):
     return None
 
 def create_activation_code(user):
-    code = generate_activation_code(user = user)
+    code = generate_activation_code()
     CodeActivate.objects.create(user = user, code = code)
-    send_activation_email(content = {'email': user.email, 'code': code})
     
-    
-def activate_account(user):
-    user.is_active = True
-    user.save()
-    Profile.objects.create(user = user)
-    send_activation_thank_email(content = {'email': user.email})
-    
+
 # Delete all Token for User
 def delete_token(user):
     token = Token.objects.filter(user = user).all()
@@ -48,8 +41,8 @@ def rest_password_request(email: str):
     user = User.objects.get(email = email)
     delete_token(user=user)
     code = generate_activation_code(user)
-    CodeActivate.objects.create(user = user, code = code)
-    reset_password_code_email(content = {'email': user, 'code': code})
+    CodeActivate.objects.create(user = user, code = code, status='rest_password')
+    
     
     
 def generate_token(user):

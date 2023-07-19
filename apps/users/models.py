@@ -30,33 +30,3 @@ class ChangeEmail(models.Model):
     
     def __str__(self):
         return self.new_email
-    
-# (name, email, phone_number, location, category, year_experience, explain_experience, additional)
-class ServiceProvider(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=180)
-    phone_number = models.CharField(max_length=15)
-    location = models.CharField(max_length=250)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
-    year_experience = models.IntegerField()
-    summary_experience = models.CharField(max_length=250)
-    additional = models.TextField(null=True, blank=True)
-    
-    
-    def __str__(self):
-        return self.name
-    
-
-class CustomServices(models.Model):
-    request_by = models.ForeignKey(User, related_name='custom_services', on_delete=models.CASCADE)
-    name = models.CharField(max_length=250)
-    slug = models.SlugField(null=True, blank=True)
-    category = models.ForeignKey(Category, models.CASCADE)
-    descriptions = models.TextField(null=True, blank=True)    
-    request_date = models.DateField(default=now)
-    request_time = models.TimeField()
-    location = models.ForeignKey(Location, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"خدمة مخصصة للمستخدم {self.request_by.username}"
-    
