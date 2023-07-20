@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Order, Review
+from .models import Order, Review, Tracking
 
 # register Order for admin
 @admin.register(Order)
@@ -9,3 +9,8 @@ class OrderAdmin(admin.ModelAdmin):
     
     
 admin.site.register(Review)
+
+
+@admin.register(Tracking)
+class TrackingAdmin(admin.ModelAdmin):
+    list_display = ['id', 'order','descriptions', 'icons']

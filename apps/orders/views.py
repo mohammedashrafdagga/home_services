@@ -1,8 +1,8 @@
-from rest_framework import generics, response
-from django.shortcuts import get_object_or_404
-from .permissions import OrderIsOwnerPermissions, IsCompleteReviewPermissions
-from .models import Order, Review, complete
-from .serializer import OrderSerializer, ReviewSerializer
+from rest_framework import generics
+from rest_framework.response import Response
+from .permissions import OrderIsOwnerPermissions, IsCompleteReviewPermissions, IsOwnerTracking
+from .models import Order, Review
+from .serializer import OrderSerializer, ReviewSerializer, TrackingSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
@@ -37,3 +37,23 @@ class ReviewCreateAPiView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated, IsCompleteReviewPermissions]
     authentication_classes = [JWTAuthentication]
   
+  
+  
+# Get List for Order View
+class OrderTrackingListAPIView(generics.RetrieveAPIView):
+    queryset = Order.objects.all()
+    serializer_class = TrackingSerializer
+    permission_classes = [IsAuthenticated, IsOwnerTracking]
+    authentication_classes = [JWTAuthentication]
+    lookup_field = 'id'
+    
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance.tracks_list.all(), many=True)
+        order_serializer = OrderSerializer(instance=instance).data
+        return Response({
+            'order': order_serializer,
+            'tracking': serializer.data
+            }
+        )
+        
