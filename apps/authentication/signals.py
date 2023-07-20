@@ -1,10 +1,15 @@
 from django.db.models.signals import post_save
+from django.urls import reverse
 from django.dispatch import receiver
 from django.contrib.auth.models import User
-from .models import CodeActivate
 from apps.users.models import Profile
-from .utils import generate_activation_code
-from .email_message import (send_activation_email, send_activation_thank_email, reset_password_code_email)
+from .email_message import (
+    send_activation_email,
+    send_activation_thank_email
+)
+from django.contrib.sites.shortcuts import get_current_site
+from .utils import get_current_request
+from rest_framework.authtoken.models import Token
 
 
 # create new User
@@ -12,9 +17,11 @@ from .email_message import (send_activation_email, send_activation_thank_email, 
 def user_post_save(sender, instance, created, **kwargs):
     if created:
         # create New Code Activation, 
-        code = generate_activation_code()
-        instance.is_active = False
-        CodeActivate.objects.create(user = instance, code = code)
+        token = Token.objects.create(user = instance)
+        request = get_current_request()
+        domain = get_current_site(request=request).domain
+        activate_link = f"http://{domain}{reverse('authentication:verify-account')}?token={token.key}"
+        send_activation_email(content={'email': instance.email,'activate_link': activate_link})
         
     
     # when update user (for example verify Code)
@@ -25,11 +32,3 @@ def user_post_save(sender, instance, created, **kwargs):
             
 
 
-# # when create Coed Activation that Mean Send Activation Code into User
-@receiver(post_save, sender=CodeActivate)
-def code_post_save(sender, instance, created, **kwargs):
-    if created:
-        if instance.status == 'verify_account':
-            send_activation_email(content={'email': instance.user.email,'code': instance.code})
-        else:
-            reset_password_code_email(content = {'email': instance.user.email, 'code': instance.code})

@@ -1,8 +1,5 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from rest_framework import status
-from rest_framework.authtoken.models import Token
-from .models import CodeActivate
 
 
 # User register Serializer
@@ -27,17 +24,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             return super().validate(attrs)
         
 
-    
-# Verify Code Activate For Activate Account
-class VerifyCodeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CodeActivate
-        fields = ['code']
-        read_only_fields = ['user']
-        
 
 # SendCodeSerializer      
-class SendCodeSerializer(serializers.Serializer):
+class SendRestPasswordUrlSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True, write_only=True)
     
     def validate(self, data):
@@ -72,15 +61,3 @@ class ChangePasswordSerializer(PasswordSerializerMixin, serializers.Serializer):
         return value
 
 
-
-# Rest password for the user
-class ResetPasswordSerializer(PasswordSerializerMixin, serializers.Serializer):
-    token = serializers.CharField(required=True, write_only=True)
-    new_password1 = serializers.CharField(required=True, write_only=True)
-    new_password2 = serializers.CharField(required=True, write_only=True)
-    
-    def validate_token(self, token):
-        if not Token.objects.get(key = token).user:
-            raise serializers.ValidationError(detail='رمر التحقق ليس صالحاً')
-        return token
-        

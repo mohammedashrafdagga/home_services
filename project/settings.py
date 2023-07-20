@@ -46,6 +46,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
      'django.middleware.locale.LocaleMiddleware',
+     'apps.authentication.utils.RequestMiddleware',
 ]
 
 ROOT_URLCONF = "project.urls"

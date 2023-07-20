@@ -1,34 +1,12 @@
-import random
-from .models import CodeActivate
-from .email_message import (
-     send_activation_thank_email,
-    reset_password_code_email, send_emailing_change_email)
-from apps.users.models import Profile
+from .email_message import reset_password_code_email
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
+import threading
+from django.utils.deprecation import MiddlewareMixin
+from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
 
-# Generate Activation Code for User
-def generate_activation_code():
-    code = ""
-    for _ in range(5):
-        digit = random.randint(0, 9)
-        code += str(digit)
 
-    return code
-    
-# Check Code Activation For user
-def check_activation_code( code):
-    active_code = CodeActivate.objects.filter(code = code).last()
-    if active_code is not None:
-        user = active_code.user
-        CodeActivate.objects.filter(user = user).all().delete()
-        return user
-    return None
-
-def create_activation_code(user):
-    code = generate_activation_code()
-    CodeActivate.objects.create(user = user, code = code)
-    
 
 # Delete all Token for User
 def delete_token(user):
@@ -37,26 +15,39 @@ def delete_token(user):
         token.delete()
 
 # rest password request
-def rest_password_request(email: str):
+def rest_password_request(request, email: str):
+    # get user with delete all token have
     user = User.objects.get(email = email)
     delete_token(user=user)
-    code = generate_activation_code(user)
-    CodeActivate.objects.create(user = user, code = code, status='rest_password')
     
+    # create new token with get domain for rest password
+    token = Token.objects.create(user = user)
+    domain = get_current_site(request=request).domain
+    rest_password_url = f"http://{domain}{reverse('authentication:rest-password-verify')}?token={token.key}"
     
-    
-def generate_token(user):
-    token,created=Token.objects.get_or_create(user=user)
-    return token.key
+    # send email for rest password
+    reset_password_code_email(content = {'email': user.email, 'rest_password_url': rest_password_url})
+
+
 
 def get_user_by_token(key_token:str):
     user = Token.objects.get(key = key_token).user
-    Token.objects.get(key = key_token)
+    Token.objects.filter(key = key_token).delete()
     return user
 
 
-def send_change_email(context):
-    code = generate_activation_code(user = context['user'])
-    CodeActivate.objects.create(user = context['user'], code = code)
-    send_emailing_change_email(content = {'email': context['new_email'], 'code': code})
-    
+# Create thread-local storage
+_thread_locals = threading.local()
+
+def get_current_request():
+    return getattr(_thread_locals, "request", None)
+
+def set_current_request(request):
+    _thread_locals.request = request
+
+
+# utils.py
+class RequestMiddleware(MiddlewareMixin):
+    def process_request(self, request):
+        # Set the current request in thread-local storage
+        set_current_request(request)
