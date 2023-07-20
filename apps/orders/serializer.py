@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Order, Review, complete
+from .models import Order, Review, complete, Tracking
 from apps.users.serializers import UserSerializer
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -36,3 +36,11 @@ class ReviewSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+    
+    
+    
+# Create Tracking Serializer
+class TrackingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tracking
+        fields = ['descriptions','icons','status']

@@ -59,3 +59,19 @@ class Review(models.Model):
     
     def __str__(self):
         return f'review: {self.rating}'
+    
+    
+    
+# Tracking Model
+class Tracking(models.Model):
+    order = models.ForeignKey(Order, related_name='tracks_list', on_delete=models.CASCADE)
+    descriptions = models.TextField()
+    status = models.CharField(null=True, blank=True)
+    icons = models.ImageField()
+    
+    # created at & implementation at
+    create_at = models.DateTimeField(auto_now_add=True)
+    
+    
+    def __str__(self):
+        return self.descriptions
