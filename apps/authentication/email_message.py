@@ -14,8 +14,8 @@ def email_sending(context:Dict):
 # sending activation email
 def send_activation_email(content:Dict):
     context =  {
-    'email_to': [content['email']], 'template_name':  'email_message/activate_code.html',
-    'message_context': {'title': 'Code for activate you account','activation_code': content['code']}}
+    'email_to': [content['email']], 'template_name':  'email_message/activate_account.html',
+    'message_context': {'title': 'Code for activate you account','activate_link': content['activate_link']}}
     email_sending(context=context)
 
 # sending email for successfully activate account into user
@@ -38,15 +38,10 @@ def send_change_password_email(content):
 def reset_password_code_email(content:Dict):
     context =  {
     'template_name':  'email_message/reset_password.html', 'email_to': [content['email']],
-    'message_context': {'title': 'resend Code for apply to reset password', "reset_password_code": content['code']}}
+    'message_context': {'title': 'resend Code for apply to reset password', "rest_password_url": content['rest_password_url']}}
     email_sending(context=context)
     
-# Send Code for Change Email 
-def send_emailing_change_email(content:Dict):
-    context =  {
-    'template_name':  'email_message/change_email.html', 'email_to': [content['email']],
-    'message_context': {'title': 'Code for verify new email adding', "code": content['code']}}
-    email_sending(context=context)
+
     
 def send_successfully_change_email(content:Dict):
     context =  {

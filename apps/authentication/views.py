@@ -1,20 +1,17 @@
 from rest_framework import generics
-from django.contrib.auth.models import User
 from .serializers import (
     UserRegistrationSerializer,
      ChangePasswordSerializer,
-    ResetPasswordSerializer,
-    SendCodeSerializer,
-    VerifyCodeSerializer
-    )
+    SendRestPasswordUrlSerializer
+)
+from django.shortcuts import render
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.response import Response 
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .utils import (
-    create_activation_code, check_activation_code,
-     rest_password_request, generate_token,
-    get_user_by_token, delete_token
+    rest_password_request,
+    get_user_by_token
 )
 from .email_message import send_change_password_email
 
@@ -27,7 +24,7 @@ class UserRegisterAPIView(generics.CreateAPIView):
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
+            user = serializer.save(is_active=False)
             user.username = serializer.validated_data['email']
             user.set_password(serializer.validated_data['password'])
             user.save()
@@ -35,34 +32,7 @@ class UserRegisterAPIView(generics.CreateAPIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# verify code user enter to activate code
-class  UserVerifyingCodeAPIView(generics.GenericAPIView):
-    permission_classes = [AllowAny]
-    serializer_class = VerifyCodeSerializer
-    def post(self, request):
-        user = check_activation_code(request.data['code'])
-        if user is not None:
-            user.is_active = True
-            user.save()
-            return Response({'detail': 'الحساب ثم تفعيله, قم بتسحيل الدخول'})
 
-        return Response({'detail': 'الكود الذي قمت بإدخاله غير صحيح'}, status=400)
-        
-# allow to user to request sending code into email
-class  UserResendCodeAPIView(generics.GenericAPIView):
-    permission_classes = [AllowAny]
-    serializer_class = SendCodeSerializer
-    
-    def post(self, request):
-        serializer = SendCodeSerializer(data = request.data)
-        if serializer.is_valid():
-            user = User.objects.get(email = serializer.validated_data['email'])
-            create_activation_code(user)
-            return Response(
-                {'detail':'كود التفعيل تم إرساله عبر الإيميل، تفقد ذلك'}
-            )
-        return Response(serializer.errors, status=400)
-  
 # allow to user to change password 
 class  ChangePasswordAPIView(generics.GenericAPIView):
     serializer_class =  ChangePasswordSerializer
@@ -81,49 +51,41 @@ class  ChangePasswordAPIView(generics.GenericAPIView):
     
 
 
-class  RestPasswordRequestCodeAPIView(generics.GenericAPIView):
+class  RestPasswordUrlAPIView(generics.GenericAPIView):
     permission_classes = [AllowAny]
-    serializer_class = SendCodeSerializer
+    serializer_class = SendRestPasswordUrlSerializer
 
     def post(self, request):
-        serializer = SendCodeSerializer(data = request.data)
+        serializer = SendRestPasswordUrlSerializer(data = request.data)
         serializer.is_valid(raise_exception=True)
-        rest_password_request(email = serializer.validated_data['email'])
+        rest_password_request(request=request, email = serializer.validated_data['email'])
         return Response(
-                {'detail': 'كود التاكيد ثم إرساله عبر الإيميل، تفقد إيميلك'}
+                {'detail': "رابط إعادة تعيين كلمة المرور تم إرساله عبر البريد الألكتروني"}
             )
+
         
-'''
-    Verify Code send for verifying Account
-'''
-class  VerifyingResetPasswordCodeAPIView(generics.GenericAPIView):
-    permission_classes = [AllowAny]
-    serializer_class = VerifyCodeSerializer
+
     
-    def post(self, request):
-        user = check_activation_code(code=request.data['code'])
-        if user is not None:
-            token = generate_token(user=user)
-            return Response({
-                    'detail': 'يمكن الإن تحديث كلمة المرور',
-                    'token': token
-                })
-        return Response({'detail': 'الكود الذي قمت بإدخال غير صحيح'})
-        
-        
-'''
-    After checking Verifying allow to user to reset password
-'''
-class  ResetPasswordAPIView(generics.GenericAPIView):
-    permission_classes = [AllowAny]
-    serializer_class = ResetPasswordSerializer
-    
-    def post(self, request):
-        serializer = ResetPasswordSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            user = get_user_by_token(key_token=serializer.validated_data['token'])
-            serializer.update(instance=user, validated_data=serializer.validated_data)
-            delete_token(user=user)
-            return Response({'detail': 'تم تحديث كلمة المرور بنجاح'})
-        return Response(serializer.errors, status=400)
-    
+# Verify account for user
+def verify_account_view(request):
+    user= get_user_by_token(key_token=request.GET.get('token'))
+    user.is_active = True
+    user.save()
+    return render(request, 'authentication/verify_account.html')
+
+
+# for rest password 
+def verify_rest_password(request):
+    error = ''
+    if request.method == 'POST':
+        # check password is matching or not
+        if request.POST['new_password1'] == request.POST['new_password2']:
+            user = get_user_by_token(key_token=request.POST.get('token'))
+            user.set_password(request.POST['new_password1'])
+            user.save()    
+            send_change_password_email(content = {'email': user.email})
+            return render(request, 'authentication/rest_password_complete.html')
+        error = 'The New Password and Confirm password Not Match'
+        return render(request, 'authentication/rest_password_form.html', context = {'token': request.POST.get('token'), 'error': error})
+    else:
+        return render(request, 'authentication/rest_password_form.html', context = {'token': request.GET.get('token'), 'error': error})
