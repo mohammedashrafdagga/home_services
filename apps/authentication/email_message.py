@@ -7,14 +7,15 @@ from typing import Dict
 def send_activation_email(content:Dict):
     context =  {
     'email_to': [content['email']], 'template_name':  'email_message/activate_account.html',
-    'message_context': {'title': 'Code for activate you account','activate_link': content['activate_link']}}
+    'message_context': {'title': 'Activate User Account',
+                        'activate_link': content['activate_link'], 'name': content['name'] }}
     email_sending(context=context)
 
 # sending email for successfully activate account into user
 def send_activation_thank_email(content):
     context =  {
     'template_name': 'email_message/is_activate.html','email_to': [content['email']],
-    'message_context': {'title': 'Thank for Activation your Account'}}
+    'message_context': {'title': 'Thank for Activation your Account', 'name': content['name']}}
     email_sending(context=context)
 
 
@@ -22,7 +23,7 @@ def send_activation_thank_email(content):
 def send_change_password_email(content):
     context =  {
     'template_name': 'email_message/change_password.html', 'email_to': [content['email']],
-    'message_context': {'title': 'Change Password is Update Successfully'}
+    'message_context': {'title': 'Update User password', 'name': content['name']}
     }
     email_sending(context=context)
 
@@ -30,7 +31,8 @@ def send_change_password_email(content):
 def reset_password_code_email(content:Dict):
     context =  {
     'template_name':  'email_message/reset_password.html', 'email_to': [content['email']],
-    'message_context': {'title': 'resend Code for apply to reset password', "rest_password_url": content['rest_password_url']}}
+    'message_context': {'title': 'Confirm Reset Password Links',
+        "rest_password_url": content['rest_password_url'], 'name': content['name']}}
     email_sending(context=context)
     
 

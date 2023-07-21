@@ -26,7 +26,8 @@ def rest_password_request(request, email: str):
     rest_password_url = f"http://{domain}{reverse('authentication:rest-password-verify')}?token={token.key}"
     
     # send email for rest password
-    reset_password_code_email(content = {'email': user.email, 'rest_password_url': rest_password_url})
+    reset_password_code_email(content = {'email': user.email,'name': f"{user.first_name} {user.last_name}",
+        'rest_password_url': rest_password_url})
 
 
 
