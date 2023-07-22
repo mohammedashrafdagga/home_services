@@ -1,6 +1,6 @@
-- refactoring all templates used in email to put nice pages with test
-- for services create new endpoint for admin only
-- allow to create new category
+- refactoring all templates used in email to put nice pages with test (Done)
+- for services create new endpoint for admin only 
+- allow to create new category ()
 - delete category
 - create new services
 - update or delete service
