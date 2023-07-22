@@ -89,3 +89,13 @@ def verify_rest_password(request):
         return render(request, 'authentication/rest_password_form.html', context = {'token': request.POST.get('token'), 'error': error})
     else:
         return render(request, 'authentication/rest_password_form.html', context = {'token': request.GET.get('token'), 'error': error})
+    
+    
+# Delete User Account
+class DeleteUserAccount(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    # For deleting Account
+    def delete(self, request):
+        request.user.delete()
+        return Response(data={'detail': 'Your Account is delete Successfully'})

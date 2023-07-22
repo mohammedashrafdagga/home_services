@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.urls import reverse
 from django.dispatch import receiver
 from django.contrib.auth.models import User
@@ -31,6 +31,3 @@ def user_post_save(sender, instance, created, **kwargs):
             Profile.objects.create(user = instance)
             send_activation_thank_email(content = {'email': instance.email,
                                                    'name': f"{instance.first_name} {instance.last_name}"})
-            
-
-
