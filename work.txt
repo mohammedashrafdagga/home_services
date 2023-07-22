@@ -1,8 +1,8 @@
 - refactoring all templates used in email to put nice pages with test (Done)
 - for services create new endpoint for admin only 
-- allow to create new category ()
-- delete category
-- create new services
+- allow to create new category (Done)
+- delete category (Done)
+- create new services (Done)
 - update or delete service
 - list all order in system
 - change status for order
