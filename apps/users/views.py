@@ -1,30 +1,24 @@
 from rest_framework import generics
-from .models import Location, Profile
+from .models import  Profile
 from .serializers import (
-    LocationSerializer, ProfileSerializer,
+    ProfileSerializer,
     EditUserSerializer, UserInformationSerializer
 )
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from .permissions import IsOwnerLocation
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.models import User
 from rest_framework import status
+from .mixins import LocationMixin, UserMixin
 
-class LocationMixin():
-    queryset = Location.objects.all()
-    serializer_class = LocationSerializer
-    permission_classes = [IsAuthenticated,IsOwnerLocation]
-    authentication_classes = [JWTAuthentication]
-    
+
+# for listing or create location
 class UserLocationListCreateAPIeView(LocationMixin, generics.ListCreateAPIView):
     def get_queryset(self):
         return super().get_queryset().filter(user = self.request.user)
     
 
+# for Retrieve, Update or delete Location
 class UserLocationDetailAPIView(LocationMixin,
     generics.RetrieveUpdateDestroyAPIView
 ):
@@ -34,9 +28,7 @@ class UserLocationDetailAPIView(LocationMixin,
     
 
 # Profile Image View for adding or creating image view
-class ProfileImageView(APIView):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
+class ProfileImageView(UserMixin, APIView):
     parser_classes = (MultiPartParser,)
 
     # Getting serializer
@@ -57,10 +49,7 @@ class ProfileImageView(APIView):
 
 
 # # Update User Information
-class EditUserInformationAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
-    
+class EditUserInformationAPIView(UserMixin, generics.GenericAPIView):
     def put(self, request):
         serializer = EditUserSerializer(instance=request.user,data=request.data)
         if serializer.is_valid():
@@ -72,9 +61,6 @@ class EditUserInformationAPIView(generics.GenericAPIView):
 
 
 # # For Getting User Information
-class UserInformationAPIView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
-   
+class UserInformationAPIView(UserMixin, generics.GenericAPIView):
     def get(self, request):
         return Response(data = UserInformationSerializer(request.user).data)

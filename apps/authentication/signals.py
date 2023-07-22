@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.urls import reverse
 from django.dispatch import receiver
 from django.contrib.auth.models import User
@@ -21,14 +21,13 @@ def user_post_save(sender, instance, created, **kwargs):
         request = get_current_request()
         domain = get_current_site(request=request).domain
         activate_link = f"http://{domain}{reverse('authentication:verify-account')}?token={token.key}"
-        send_activation_email(content={'email': instance.email,'activate_link': activate_link})
+        send_activation_email(content={'email': instance.email,'activate_link': activate_link,
+            'name': f"{instance.first_name} {instance.last_name}"})
         
     
     # when update user (for example verify Code)
     if instance.is_active:
         if not Profile.objects.filter(user = instance).exists():
             Profile.objects.create(user = instance)
-            send_activation_thank_email(content = {'email': instance.email})
-            
-
-
+            send_activation_thank_email(content = {'email': instance.email,
+                                                   'name': f"{instance.first_name} {instance.last_name}"})

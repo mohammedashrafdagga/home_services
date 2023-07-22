@@ -64,14 +64,13 @@ class  RestPasswordUrlAPIView(generics.GenericAPIView):
             )
 
         
-
-    
 # Verify account for user
 def verify_account_view(request):
     user= get_user_by_token(key_token=request.GET.get('token'))
     user.is_active = True
     user.save()
-    return render(request, 'authentication/verify_account.html')
+    return render(request, 'authentication/verify_account.html', context = {'name': 
+        f"{user.first_name} {user.last_name}"})
 
 
 # for rest password 
@@ -83,9 +82,20 @@ def verify_rest_password(request):
             user = get_user_by_token(key_token=request.POST.get('token'))
             user.set_password(request.POST['new_password1'])
             user.save()    
-            send_change_password_email(content = {'email': user.email})
+            send_change_password_email(content = {'email': user.email,
+                'name': f"{user.first_name} {user.last_name}"})
             return render(request, 'authentication/rest_password_complete.html')
         error = 'The New Password and Confirm password Not Match'
         return render(request, 'authentication/rest_password_form.html', context = {'token': request.POST.get('token'), 'error': error})
     else:
         return render(request, 'authentication/rest_password_form.html', context = {'token': request.GET.get('token'), 'error': error})
+    
+    
+# Delete User Account
+class DeleteUserAccount(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    # For deleting Account
+    def delete(self, request):
+        request.user.delete()
+        return Response(data={'detail': 'Your Account is delete Successfully'})

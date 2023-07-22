@@ -1,8 +1,9 @@
 ### Home Maintenance Services System Provider API
 
 Building Using Django With Django Rest Framework that integrates with Mobile Application
-![application Image](media/project_image/readme.png) <br/>
+![application Image](static/project_image/readme.png) <br/>
 we building API for Applications that allow the user to see all services that can provide by the system to help to make maintenance at home is easy and quick.
+
 
 The Services are divided under categories in the system, such as services under the category of electricity, plumbing, or maintenance of electrical appliances.
 

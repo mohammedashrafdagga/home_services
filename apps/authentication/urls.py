@@ -9,7 +9,8 @@ from .views import (
   ChangePasswordAPIView,
   RestPasswordUrlAPIView,
   verify_account_view,
-  verify_rest_password
+  verify_rest_password,
+  DeleteUserAccount
 )
 
 app_name = 'authentication'
@@ -17,6 +18,7 @@ app_name = 'authentication'
 urlpatterns = [
   path('register/', UserRegisterAPIView.as_view(), name = 'register'),
   path('login/', TokenObtainPairView.as_view(), name='login'),
+  path('delete-account/', DeleteUserAccount.as_view(), name='delete-account'),
   path('login-refresh/', TokenRefreshView.as_view(), name='login-refresh'),
   path('logout/', TokenBlacklistView.as_view(), name= 'logout'),
   path('verify-account/', verify_account_view, name='verify-account'),

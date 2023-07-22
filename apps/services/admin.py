@@ -23,7 +23,7 @@ class ServicesAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         obj.created_by = request.user
-        obj.slug = f"{str(self.validated_data['name']).replace(' ', '-')}-{uuid.uuid4()}"
+        obj.slug = uuid.uuid4()
         super().save_model(request, obj, form, change)
 
 
