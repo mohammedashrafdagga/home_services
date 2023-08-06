@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'apps.services',
     'apps.orders',
     'apps.users',
+    'apps.notification',
 ]
 
 MIDDLEWARE = [

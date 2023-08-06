@@ -1,25 +1,31 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Order, Tracking
-
+from apps.notification.models import Notification
 
 
 def get_descriptions(order):
     services_name = order.service.name
     data = {
     'قيد المراجعة': {
-        'descriptions':f"الطلب لخدمة {services_name} قيد المراجعة الآن",
-        'image': r'tracking_images\review.png'
+        'descriptions':f"The Order you request {services_name} is Under review",
+        'image': r'tracking_images\review.png',
+        'notification': f'You Are Creating New Order for {services_name}'
     },
     'قيد التنفيذ': {
-        'descriptions':f"الطلب لخدمة {services_name} قيد التنفيذ حالياً",
-        'image': r'tracking_images\under_work.png'},
+        'descriptions':f"The implementation of the {services_name} has started",
+        'image': r'tracking_images\under_work.png',
+        'notification': f"we start the implementation the order for {services_name}"
+        },
     'مكتمل': {
-        'descriptions':f"الطلب لخدمة {services_name} أصبح مكتملاً الأن",
-        'image': r'tracking_images\complete.png'},
+        'descriptions':f"The Order for {services_name} has been completed successfully",
+        'image': r'tracking_images\complete.png',
+        'notification': f"we finished implementation the order for {services_name}"
+        },
     'مرفوض': {
-         'descriptions':f"الطلب لخدمة {services_name} مرفوض",
-        'image': r'tracking_images\rejected.png'
+         'descriptions':f"You order for {services_name} has rejected",
+        'image': r'tracking_images\rejected.png',
+        'notification': f"You order for {services_name} has rejected"
     }
     }
     return data[order.order_status]
@@ -34,4 +40,5 @@ def order_post_save(sender, instance, created, **kwargs):
         descriptions = data['descriptions'],
         icons = data['image']
     )
+    Notification.objects.create(user = instance.user, message=data['notification'])
         
