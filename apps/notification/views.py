@@ -18,4 +18,4 @@ class NotificationMarkAsReadAPIView(NotificationMixin, generics.GenericAPIView):
         instance = self.get_object()
         instance.is_read = True
         instance.save()
-        return Response(NotificationSerializer(instance=instance).data)
+        return Response(NotificationSerializer(instance=instance).datao)
